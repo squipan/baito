@@ -20,8 +20,8 @@ const manifestData = {
   background_color: "#ffffff",
   theme_color: "#1D9E75",
   icons: [
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231D9E75'/><text y='140' x='30' font-size='130' font-family='sans-serif'>💴</text></svg>", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231D9E75'/><text y='380' x='60' font-size='360' font-family='sans-serif'>💴</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%231D9E75'/><rect x='28' y='58' width='136' height='88' rx='12' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='2'/><rect x='28' y='80' width='136' height='3' fill='rgba(255,255,255,0.35)'/><circle cx='62' cy='103' r='13' fill='white' opacity='0.9'/><circle cx='86' cy='103' r='13' fill='white' opacity='0.5'/><rect x='104' y='95' width='44' height='8' rx='4' fill='rgba(255,255,255,0.45)'/><rect x='104' y='109' width='30' height='6' rx='3' fill='rgba(255,255,255,0.3)'/><text x='96' y='168' font-size='16' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='2'>収入</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231D9E75'/><rect x='74' y='152' width='364' height='234' rx='32' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='5'/><rect x='74' y='212' width='364' height='8' fill='rgba(255,255,255,0.35)'/><circle cx='166' cy='270' r='36' fill='white' opacity='0.9'/><circle cx='230' cy='270' r='36' fill='white' opacity='0.5'/><rect x='276' y='248' width='118' height='22' rx='11' fill='rgba(255,255,255,0.45)'/><rect x='276' y='280' width='80' height='16' rx='8' fill='rgba(255,255,255,0.3)'/><text x='256' y='448' font-size='44' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='4'>収入</text></svg>", sizes: "512x512", type: "image/svg+xml" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
@@ -111,7 +111,7 @@ body {
 .scroll-area::-webkit-scrollbar { display: none; }
 
 .bnav {
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(6, 1fr);
   background: var(--card); border-top: 0.5px solid var(--border2);
   padding: 8px 0 max(10px, env(safe-area-inset-bottom));
   position: sticky; bottom: 0; z-index: 100;
@@ -316,6 +316,20 @@ body {
   cursor: pointer; font-family: var(--font);
 }
 .wallet-note { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0 2px; line-height: 1.6; }
+/* Salary */
+.salary-month-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
+.smc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.smc-month { font-size: 15px; font-weight: 500; color: var(--text); }
+.smc-total { font-size: 18px; font-weight: 500; font-family: var(--mono); color: var(--green); }
+.smc-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-top: 0.5px solid var(--border); }
+.smc-lbl { font-size: 12px; color: var(--text2); }
+.smc-val { font-size: 13px; font-weight: 500; font-family: var(--mono); color: var(--text); }
+.smc-val.pos { color: var(--green); }
+.smc-val.neg { color: var(--red); }
+.salary-year-banner { background: var(--green-bg); border-radius: var(--r); padding: 14px 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+.syb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+.syb-val { font-size: 24px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
+
 
 /* FIX 8: ensure html/body bg tracks dark class on app */
 html { background: #f7f6f2; }
@@ -531,6 +545,43 @@ html.dark-html { background: #0e0e0e; }
       <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
     </div>
 
+
+    <!-- SALARY -->
+    <div class="page" id="page-salary">
+      <div class="topbar">
+        <div class="pg-title">Main Job</div>
+        <button class="tbtn" id="tbtn6" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
+      </div>
+      <div id="salary-year-banner"></div>
+      <div class="card2">
+        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Log salary</div>
+        <div class="frow">
+          <div class="f"><label>Month</label>
+            <select id="sal-month">
+              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+            </select>
+          </div>
+          <div class="f"><label>Year</label>
+            <select id="sal-year">
+              <option>2024</option><option>2025</option><option selected>2026</option><option>2027</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="f"><label>Base salary (¥)</label><input type="number" id="sal-base" placeholder="250000"></div>
+          <div class="f"><label>Bonus (¥)</label><input type="number" id="sal-bonus" placeholder="0"></div>
+        </div>
+        <div class="frow" style="margin-bottom:10px">
+          <div class="f"><label>Tax / deductions (¥)</label><input type="number" id="sal-tax" placeholder="0"></div>
+          <div class="f"><label>Note</label><input type="text" id="sal-note" placeholder="optional"></div>
+        </div>
+        <button class="btn-add" onclick="addSalary()"><i class="ti ti-plus" aria-hidden="true"></i> Add month</button>
+      </div>
+      <div id="salary-list"></div>
+    </div>
+
   </div>
 
   <!-- Bottom Nav -->
@@ -549,6 +600,9 @@ html.dark-html { background: #0e0e0e; }
     </button>
     <button class="nb" onclick="goPage('wallet')" aria-label="Wallet">
       <i class="ti ti-wallet" aria-hidden="true"></i><span>Wallet</span>
+    </button>
+    <button class="nb" onclick="goPage('salary')" aria-label="Salary">
+      <i class="ti ti-briefcase" aria-hidden="true"></i><span>Job</span>
     </button>
   </div>
 </div>
@@ -633,7 +687,7 @@ function toggleTheme() {
   const icon = dark ? 'ti-sun' : 'ti-moon';
   const label = dark ? 'Light' : 'Dark';
   document.getElementById('tbtn').innerHTML = `<i class="ti ${icon}" aria-hidden="true"></i> ${label}`;
-  ['tbtn2','tbtn3','tbtn4','tbtn5'].forEach(id => {
+  ['tbtn2','tbtn3','tbtn4','tbtn5','tbtn6'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = `<i class="ti ${icon}" aria-hidden="true"></i>`;
   });
@@ -644,7 +698,7 @@ function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  ['home','months','english','gas','wallet'].forEach((n,i) => {
+  ['home','months','english','gas','wallet','salary'].forEach((n,i) => {
     if (n === name) document.querySelectorAll('.nb')[i].classList.add('active');
   });
   document.getElementById('scroll').scrollTop = 0;
@@ -652,6 +706,7 @@ function goPage(name) {
   else if (name === 'months') renderMonths();
   else if (name === 'english') renderEnglish();
   else if (name === 'gas') renderGas();
+  else if (name === 'salary') renderSalary();
   else renderWallet();
 }
 
@@ -932,6 +987,61 @@ function renderWallet() {
     : 'All accounts included';
 }
 
+
+function addSalary() {
+  const month = document.getElementById('sal-month').value;
+  const year = document.getElementById('sal-year').value;
+  const base = parseFloat(document.getElementById('sal-base').value) || 0;
+  const bonus = parseFloat(document.getElementById('sal-bonus').value) || 0;
+  const tax = parseFloat(document.getElementById('sal-tax').value) || 0;
+  const note = document.getElementById('sal-note').value.trim();
+  if (!base) { toast('Enter base salary'); return; }
+  const items = gd('salary') || [];
+  // replace existing entry for same month/year
+  const idx = items.findIndex(x => x.month === month && x.year === year);
+  const entry = { id: Date.now(), year, month, base, bonus, tax, note };
+  if (idx >= 0) items[idx] = entry; else items.push(entry);
+  sd('salary', items);
+  document.getElementById('sal-base').value = '';
+  document.getElementById('sal-bonus').value = '';
+  document.getElementById('sal-tax').value = '';
+  document.getElementById('sal-note').value = '';
+  toast('Saved!'); renderSalary();
+}
+function delSalary(id) {
+  sd('salary', (gd('salary') || []).filter(x => x.id !== id));
+  renderSalary();
+}
+function renderSalary() {
+  const items = (gd('salary') || []).sort((a,b) => (b.year+b.month).localeCompare(a.year+a.month));
+  const banner = document.getElementById('salary-year-banner');
+  const el = document.getElementById('salary-list');
+  const yr = new Date().getFullYear().toString();
+  const yearTotal = items.filter(x => x.year === yr).reduce((s, x) => s + x.base + x.bonus - x.tax, 0);
+  banner.innerHTML = items.length ? `<div class="salary-year-banner">
+    <div><div class="syb-lbl">Net income ${yr}</div><div class="syb-val">${yen(yearTotal)}</div></div>
+    <i class="ti ti-briefcase" style="font-size:30px;opacity:0.5;color:var(--green-text)" aria-hidden="true"></i>
+  </div>` : '';
+  if (!items.length) { el.innerHTML = '<div class="empty">No salary logged yet</div>'; return; }
+  let html = '';
+  items.forEach(x => {
+    const net = x.base + x.bonus - x.tax;
+    html += `<div class="salary-month-card">
+      <div class="smc-header">
+        <div class="smc-month">${x.year} · ${x.month}${x.note ? ' <span style="font-size:11px;color:var(--text3)">— '+x.note+'</span>' : ''}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="smc-total">${yen(net)}</div>
+          <button class="del-btn" onclick="delSalary(${x.id})" aria-label="delete">×</button>
+        </div>
+      </div>
+      <div class="smc-row"><span class="smc-lbl">Base salary</span><span class="smc-val">${yen(x.base)}</span></div>
+      ${x.bonus ? `<div class="smc-row"><span class="smc-lbl">Bonus</span><span class="smc-val pos">+${yen(x.bonus)}</span></div>` : ''}
+      ${x.tax ? `<div class="smc-row"><span class="smc-lbl">Tax / deductions</span><span class="smc-val neg">−${yen(x.tax)}</span></div>` : ''}
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
 function seed() {
   if ((gd('shifts') || []).length) return;
   const raw = [
@@ -1001,7 +1111,7 @@ if (localStorage.getItem('theme') === 'dark') {
   dark = true;
   applyTheme();
   document.getElementById('tbtn').innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i> Light';
-  ['tbtn2','tbtn3','tbtn4','tbtn5'].forEach(id => {
+  ['tbtn2','tbtn3','tbtn4','tbtn5','tbtn6'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i>';
   });
