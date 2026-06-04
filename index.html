@@ -10,7 +10,6 @@
 <meta name="description" content="Track shifts, English lessons and gas expenses">
 <title>My Income</title>
 
-<!-- PWA Manifest inline -->
 <script>
 const manifestData = {
   name: "My Income Tracker",
@@ -53,6 +52,9 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
   --blue: #1a6fb5;
   --blue-bg: #e6f1fb;
   --blue-text: #0c447c;
+  --purple: #534AB7;
+  --purple-bg: #EEEDFE;
+  --purple-text: #3C3489;
   --red: #c0392b;
   --font: 'DM Sans', sans-serif;
   --mono: 'DM Mono', monospace;
@@ -77,9 +79,18 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
   --blue: #5aa3e8;
   --blue-bg: #0a2a4a;
   --blue-text: #B5D4F4;
+  --purple: #AFA9EC;
+  --purple-bg: #26215C;
+  --purple-text: #CECBF6;
+  --red: #e05c4b;
 }
+
+/* FIX 1: propagate dark bg to html/body so no white flash */
+html, body { height: 100%; overflow: hidden; background: var(--bg, #f7f6f2); }
+.dark ~ body, body:has(.dark) { background: #0e0e0e; }
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
+
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -88,14 +99,19 @@ body {
   line-height: 1.4;
 }
 
-/* App shell */
-.app { display: flex; flex-direction: column; height: 100vh; max-width: 430px; margin: 0 auto; position: relative; }
+/* FIX 2: app covers full screen and inherits bg */
+.app {
+  display: flex; flex-direction: column; height: 100vh;
+  max-width: 430px; margin: 0 auto; position: relative;
+  background: var(--bg);
+  color: var(--text);
+}
+
 .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 90px; }
 .scroll-area::-webkit-scrollbar { display: none; }
 
-/* Bottom nav */
 .bnav {
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   background: var(--card); border-top: 0.5px solid var(--border2);
   padding: 8px 0 max(10px, env(safe-area-inset-bottom));
   position: sticky; bottom: 0; z-index: 100;
@@ -109,13 +125,11 @@ body {
 .nb i { font-size: 22px; }
 .nb.active { color: var(--green); }
 
-/* Pages */
 .page { display: none; }
 .page.active { display: block; }
 
-/* Topbar */
 .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-.pg-title { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; }
+.pg-title { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; color: var(--text); }
 .tbtn {
   background: var(--card2); border: 0.5px solid var(--border2);
   border-radius: 99px; padding: 6px 13px; font-size: 12px;
@@ -124,15 +138,13 @@ body {
 }
 .tbtn:active { opacity: 0.7; }
 
-/* Cards */
 .card {
   background: var(--card); border: 0.5px solid var(--border);
   border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
 }
 .card2 { background: var(--card2); border-radius: var(--r); padding: 13px 15px; margin-bottom: 12px; }
 
-/* Hero date */
-.hero-date { font-size: 28px; font-weight: 300; letter-spacing: -0.5px; }
+.hero-date { font-size: 28px; font-weight: 300; letter-spacing: -0.5px; color: var(--text); }
 .hero-weekday { font-size: 13px; color: var(--text2); margin-top: 2px; margin-bottom: 14px; }
 .hero-divider { border: none; border-top: 0.5px solid var(--border); margin-bottom: 14px; }
 .income-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -142,11 +154,11 @@ body {
 .ic-val.g { color: var(--green); }
 .ic-val.b { color: var(--blue); }
 
-/* Form */
 .card-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
 .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .f { }
 .f label { font-size: 10px; color: var(--text3); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+/* FIX 3: inputs and selects fully themed */
 .f input, .f select {
   width: 100%; background: var(--bg); border: 0.5px solid var(--border2);
   border-radius: var(--r-sm); padding: 9px 11px; font-size: 13px;
@@ -155,6 +167,10 @@ body {
 }
 .f input:focus, .f select:focus { border-color: var(--green); }
 .f input[readonly] { color: var(--text2); background: var(--card2); }
+
+/* FIX 4: select option text in dark mode */
+.f select option { background: var(--card); color: var(--text); }
+
 .preview-pill {
   background: var(--amber-bg); border-radius: var(--r-sm); padding: 9px 12px;
   margin-bottom: 8px; display: none; justify-content: space-between; align-items: center;
@@ -170,9 +186,8 @@ body {
 }
 .btn-add:active { opacity: 0.8; }
 
-/* Month nav */
 .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.m-title { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; }
+.m-title { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; color: var(--text); }
 .arrows { display: flex; gap: 6px; }
 .arr {
   background: var(--card2); border: 0.5px solid var(--border2);
@@ -183,20 +198,19 @@ body {
 .arr:hover { background: var(--card); }
 .arr:disabled { opacity: 0.3; cursor: default; }
 
-/* Stats */
 .stat3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 12px; }
 .sc { background: var(--card2); border-radius: var(--r-sm); padding: 10px 11px; }
 .sc-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
-.sc-val { font-size: 15px; font-weight: 500; font-family: var(--mono); }
+.sc-val { font-size: 15px; font-weight: 500; font-family: var(--mono); color: var(--text); }
 .sc-val.g { color: var(--green); }
 .sc-val.a { color: var(--amber); }
 
-/* Actual received */
 .actual-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .actual-big { font-size: 22px; font-weight: 500; color: var(--green); font-family: var(--mono); margin-bottom: 2px; }
 .actual-diff { font-size: 11px; margin-bottom: 10px; }
 .actual-pending { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
 .inp-row { display: flex; gap: 6px; }
+/* FIX 5: standalone inputs (not inside .f) also themed */
 .inp-row input {
   flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
   border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
@@ -209,12 +223,13 @@ body {
   cursor: pointer; font-family: var(--font);
 }
 
-/* Shift table */
 .sec-hd { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 8px; }
+
+/* FIX 6: table text fully uses theme vars */
 .shift-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .shift-tbl th { font-size: 10px; color: var(--text3); font-weight: 400; padding: 0 4px 7px; text-align: left; border-bottom: 0.5px solid var(--border2); letter-spacing: 0.03em; text-transform: uppercase; }
 .shift-tbl th.r { text-align: right; }
-.shift-tbl td { padding: 9px 4px; border-bottom: 0.5px solid var(--border); font-size: 12px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shift-tbl td { padding: 9px 4px; border-bottom: 0.5px solid var(--border); font-size: 12px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
 .shift-tbl td.r { text-align: right; font-family: var(--mono); }
 .shift-tbl tr:last-child td { border-bottom: none; }
 .shift-tbl tr.dim td { color: var(--text3); }
@@ -224,29 +239,24 @@ body {
 .del-btn:hover { color: var(--red); }
 .tot-row td { font-size: 11px; color: var(--text2); padding-top: 10px; border-top: 0.5px solid var(--border2) !important; border-bottom: none !important; font-family: var(--mono); }
 
-/* Entries (English / Gas) */
 .mgrp { font-size: 11px; font-weight: 500; color: var(--text2); padding: 8px 0 4px; border-bottom: 0.5px solid var(--border2); margin-bottom: 3px; }
 .entry { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
 .entry:last-of-type { border-bottom: none; }
-.e-main { font-size: 13px; font-weight: 500; }
+.e-main { font-size: 13px; font-weight: 500; color: var(--text); }
 .e-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.e-amt { font-size: 14px; font-weight: 500; font-family: var(--mono); }
+.e-amt { font-size: 14px; font-weight: 500; font-family: var(--mono); color: var(--text); }
 .total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; border-top: 0.5px solid var(--border2); margin-top: 4px; }
 
-/* Gas banner */
 .gas-banner { background: var(--green-bg); border-radius: var(--r); padding: 13px 15px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
 .gb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
 .gb-val { font-size: 22px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
 
-/* Dot */
 .dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
 .dot.done { background: var(--green); }
 .dot.up { background: var(--text3); }
 
-/* Empty */
 .empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px 0; line-height: 1.6; }
 
-/* Toast */
 .toast-wrap { text-align: center; min-height: 30px; margin-top: 6px; }
 .toast {
   background: var(--text); color: var(--card); padding: 6px 18px;
@@ -254,6 +264,62 @@ body {
   pointer-events: none; display: inline-block;
 }
 .toast.show { opacity: 1; }
+
+/* Wallet */
+.wallet-grand {
+  background: var(--green); border-radius: var(--r);
+  padding: 18px 18px; margin-bottom: 14px;
+}
+.wg-lbl { font-size: 10px; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.wg-val { font-size: 32px; font-weight: 500; color: #fff; font-family: var(--mono); letter-spacing: -1px; }
+.wg-updated { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+.wallet-accounts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.wacc {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.wacc-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; }
+.wacc-icon {
+  width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.wacc-icon.ufj { background: var(--blue-bg); color: var(--blue); }
+.wacc-icon.yucho { background: var(--amber-bg); color: var(--amber); }
+.wacc-icon.english { background: var(--purple-bg); color: var(--purple); }
+.wacc-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.wacc-updated { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.wacc-right { text-align: right; flex-shrink: 0; }
+.wacc-amt { font-size: 18px; font-weight: 500; font-family: var(--mono); }
+.wacc-amt.ufj { color: var(--blue); }
+.wacc-amt.yucho { color: var(--amber); }
+.wacc-amt.english { color: var(--purple); }
+.wacc-edit { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; margin-top: 2px; }
+.wacc-edit:hover { color: var(--green); }
+.wallet-edit-form {
+  background: var(--card2); border-radius: var(--r-sm);
+  padding: 12px 14px; margin-top: 10px; display: none;
+}
+.wallet-edit-form.open { display: block; }
+.we-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+.we-row { display: flex; gap: 6px; }
+/* FIX 7: wallet edit inputs themed */
+.we-row input {
+  flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
+  color: var(--text); font-family: var(--mono); outline: none;
+}
+.we-row input:focus { border-color: var(--green); }
+.we-row button {
+  background: var(--green); color: #fff; border: none;
+  border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: var(--font);
+}
+.wallet-note { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0 2px; line-height: 1.6; }
+
+/* FIX 8: ensure html/body bg tracks dark class on app */
+html { background: #f7f6f2; }
+html.dark-html { background: #0e0e0e; }
 </style>
 </head>
 <body>
@@ -381,6 +447,90 @@ body {
       <div id="gas-list"></div>
     </div>
 
+    <!-- WALLET -->
+    <div class="page" id="page-wallet">
+      <div class="topbar">
+        <div class="pg-title">Wallet</div>
+        <button class="tbtn" id="tbtn5" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
+      </div>
+
+      <div class="wallet-grand" id="w-grand">
+        <div class="wg-lbl">Grand total</div>
+        <div class="wg-val" id="w-grand-val">¥0</div>
+        <div class="wg-updated" id="w-grand-sub"></div>
+      </div>
+
+      <div class="wallet-accounts">
+
+        <!-- UFJ -->
+        <div>
+          <div class="wacc">
+            <div class="wacc-left">
+              <div class="wacc-icon ufj"><i class="ti ti-building-bank" aria-hidden="true"></i></div>
+              <div>
+                <div class="wacc-name">UFJ</div>
+                <div class="wacc-updated" id="w-ufj-date">—</div>
+              </div>
+            </div>
+            <div class="wacc-right">
+              <div class="wacc-amt ufj" id="w-ufj-val">—</div>
+              <button class="wacc-edit" onclick="toggleEdit('ufj')" aria-label="edit UFJ balance"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="wallet-edit-form" id="edit-ufj">
+            <div class="we-lbl">Current UFJ balance (¥)</div>
+            <div class="we-row">
+              <input type="number" id="inp-ufj" placeholder="e.g. 45000">
+              <button onclick="saveWallet('ufj')">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ゆうちょ -->
+        <div>
+          <div class="wacc">
+            <div class="wacc-left">
+              <div class="wacc-icon yucho"><i class="ti ti-mail" aria-hidden="true"></i></div>
+              <div>
+                <div class="wacc-name">ゆうちょ</div>
+                <div class="wacc-updated" id="w-yucho-date">—</div>
+              </div>
+            </div>
+            <div class="wacc-right">
+              <div class="wacc-amt yucho" id="w-yucho-val">—</div>
+              <button class="wacc-edit" onclick="toggleEdit('yucho')" aria-label="edit ゆうちょ balance"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="wallet-edit-form" id="edit-yucho">
+            <div class="we-lbl">Current ゆうちょ balance (¥)</div>
+            <div class="we-row">
+              <input type="number" id="inp-yucho" placeholder="e.g. 20000">
+              <button onclick="saveWallet('yucho')">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- English lessons total -->
+        <div>
+          <div class="wacc">
+            <div class="wacc-left">
+              <div class="wacc-icon english"><i class="ti ti-school" aria-hidden="true"></i></div>
+              <div>
+                <div class="wacc-name">English lessons</div>
+                <div class="wacc-updated" id="w-english-date">All time total</div>
+              </div>
+            </div>
+            <div class="wacc-right">
+              <div class="wacc-amt english" id="w-english-val">¥0</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
+    </div>
+
   </div>
 
   <!-- Bottom Nav -->
@@ -397,11 +547,13 @@ body {
     <button class="nb" onclick="goPage('gas')" aria-label="Gas">
       <i class="ti ti-gas-station" aria-hidden="true"></i><span>Gas</span>
     </button>
+    <button class="nb" onclick="goPage('wallet')" aria-label="Wallet">
+      <i class="ti ti-wallet" aria-hidden="true"></i><span>Wallet</span>
+    </button>
   </div>
 </div>
 
 <script>
-// ── Service Worker ──────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   const swCode = `
     const CACHE = 'income-v1';
@@ -421,18 +573,15 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
 }
 
-// ── Constants ───────────────────────────────────────────────────
 const DAYS = ['日','月','火','水','木','金','土'];
 const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 const DAY_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MON_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 let dark = false, curMonth = 0;
 
-// ── Storage ─────────────────────────────────────────────────────
 function gd(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch(e) { return []; } }
 function sd(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
 
-// ── Helpers ─────────────────────────────────────────────────────
 function yen(n) { return '¥' + Math.round(n).toLocaleString('ja-JP'); }
 function fmtH(m) { const h = Math.floor(m/60), mm = Math.round(m%60); return h + ':' + (mm < 10 ? '0' : '') + mm; }
 function tH(t) { if (!t) return 0; const [h, m] = t.split(':').map(Number); return h + m/60; }
@@ -464,35 +613,42 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-// ── Theme ────────────────────────────────────────────────────────
+function applyTheme() {
+  const app = document.getElementById('app');
+  app.classList.toggle('dark', dark);
+  // FIX: also update html/body background so no white shows outside the app div
+  document.documentElement.style.background = dark ? '#0e0e0e' : '#f7f6f2';
+  document.body.style.background = dark ? '#0e0e0e' : '#f7f6f2';
+}
+
 function toggleTheme() {
   dark = !dark;
-  document.getElementById('app').classList.toggle('dark', dark);
-  const ic = dark ? '<i class="ti ti-sun" aria-hidden="true"></i> Light' : '<i class="ti ti-moon" aria-hidden="true"></i> Dark';
-  document.getElementById('tbtn').innerHTML = ic;
-  ['tbtn2','tbtn3','tbtn4'].forEach(id => {
+  applyTheme();
+  const icon = dark ? 'ti-sun' : 'ti-moon';
+  const label = dark ? 'Light' : 'Dark';
+  document.getElementById('tbtn').innerHTML = `<i class="ti ${icon}" aria-hidden="true"></i> ${label}`;
+  ['tbtn2','tbtn3','tbtn4','tbtn5'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.innerHTML = dark ? '<i class="ti ti-sun" aria-hidden="true"></i>' : '<i class="ti ti-moon" aria-hidden="true"></i>';
+    if (el) el.innerHTML = `<i class="ti ${icon}" aria-hidden="true"></i>`;
   });
   localStorage.setItem('theme', dark ? 'dark' : 'light');
 }
 
-// ── Navigation ───────────────────────────────────────────────────
 function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  ['home','months','english','gas'].forEach((n,i) => {
+  ['home','months','english','gas','wallet'].forEach((n,i) => {
     if (n === name) document.querySelectorAll('.nb')[i].classList.add('active');
   });
   document.getElementById('scroll').scrollTop = 0;
   if (name === 'home') renderHome();
   else if (name === 'months') renderMonths();
   else if (name === 'english') renderEnglish();
-  else renderGas();
+  else if (name === 'gas') renderGas();
+  else renderWallet();
 }
 
-// ── Home ─────────────────────────────────────────────────────────
 function renderHome() {
   const now = new Date();
   document.getElementById('h-date').textContent = `${MON_EN[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
@@ -553,7 +709,6 @@ function qlSubmit() {
   renderHome();
 }
 
-// ── Months ───────────────────────────────────────────────────────
 function getMonths() { const seen = new Set(gd('shifts').map(s => s.month)); return MONTHS.filter(m => seen.has(m)); }
 function chMonth(d) { const ms = getMonths(); curMonth = Math.max(0, Math.min(ms.length-1, curMonth+d)); renderMonths(); }
 function renderMonths() {
@@ -628,7 +783,6 @@ function delShift(id) {
   renderMonths(); renderHome();
 }
 
-// ── English ──────────────────────────────────────────────────────
 function renderEnglish() {
   const items = (gd('english') || []).sort((a,b) => (a.year+a.month).localeCompare(b.year+b.month));
   const el = document.getElementById('english-list');
@@ -669,7 +823,6 @@ function delEnglish(id) {
   renderEnglish(); renderHome();
 }
 
-// ── Gas ──────────────────────────────────────────────────────────
 function renderGas() {
   const items = (gd('gas') || []).sort((a,b) => a.date.localeCompare(b.date));
   const el = document.getElementById('gas-list');
@@ -723,7 +876,56 @@ function addGas() {
 }
 function delGas(id) { sd('gas', (gd('gas') || []).filter(x => x.id !== id)); renderGas(); }
 
-// ── Seed data ────────────────────────────────────────────────────
+function fmtDate(ts) {
+  if (!ts) return 'Not set yet';
+  const d = new Date(ts);
+  return 'Updated ' + d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+}
+function toggleEdit(key) {
+  const form = document.getElementById('edit-' + key);
+  const isOpen = form.classList.contains('open');
+  document.querySelectorAll('.wallet-edit-form').forEach(f => f.classList.remove('open'));
+  if (!isOpen) {
+    form.classList.add('open');
+    const wallet = gd('wallet') || {};
+    const inp = document.getElementById('inp-' + key);
+    inp.value = wallet[key] != null ? wallet[key].amount : '';
+    inp.focus();
+  }
+}
+function saveWallet(key) {
+  const v = parseFloat(document.getElementById('inp-' + key).value);
+  if (isNaN(v)) { toast('Enter a valid amount'); return; }
+  const wallet = gd('wallet') || {};
+  wallet[key] = { amount: v, ts: Date.now() };
+  sd('wallet', wallet);
+  document.getElementById('edit-' + key).classList.remove('open');
+  toast('Saved!');
+  renderWallet();
+}
+function renderWallet() {
+  const wallet = gd('wallet') || {};
+  const english = gd('english') || [];
+  const engTotal = english.reduce((s, x) => s + (x.amount || 0), 0);
+  const ufj = wallet['ufj'];
+  const yucho = wallet['yucho'];
+  const ufjAmt = ufj != null ? ufj.amount : null;
+  const yuchoAmt = yucho != null ? yucho.amount : null;
+  document.getElementById('w-ufj-val').textContent = ufjAmt != null ? yen(ufjAmt) : '—';
+  document.getElementById('w-ufj-date').textContent = fmtDate(ufj ? ufj.ts : null);
+  document.getElementById('w-yucho-val').textContent = yuchoAmt != null ? yen(yuchoAmt) : '—';
+  document.getElementById('w-yucho-date').textContent = fmtDate(yucho ? yucho.ts : null);
+  document.getElementById('w-english-val').textContent = yen(engTotal);
+  const grand = (ufjAmt || 0) + (yuchoAmt || 0) + engTotal;
+  document.getElementById('w-grand-val').textContent = yen(grand);
+  const parts = [];
+  if (ufjAmt == null) parts.push('UFJ');
+  if (yuchoAmt == null) parts.push('ゆうちょ');
+  document.getElementById('w-grand-sub').textContent = parts.length
+    ? parts.join(' & ') + ' balance not set — total may be incomplete'
+    : 'All accounts included';
+}
+
 function seed() {
   if ((gd('shifts') || []).length) return;
   const raw = [
@@ -788,12 +990,12 @@ function seed() {
   ]);
 }
 
-// ── Init ─────────────────────────────────────────────────────────
+// Init
 if (localStorage.getItem('theme') === 'dark') {
   dark = true;
-  document.getElementById('app').classList.add('dark');
+  applyTheme();
   document.getElementById('tbtn').innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i> Light';
-  ['tbtn2','tbtn3','tbtn4'].forEach(id => {
+  ['tbtn2','tbtn3','tbtn4','tbtn5'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i>';
   });
