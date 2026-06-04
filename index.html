@@ -490,7 +490,7 @@ html.dark-html { background: #0e0e0e; }
         <div>
           <div class="wacc">
             <div class="wacc-left">
-              <div class="wacc-icon yucho"><i class="ti ti-mail" aria-hidden="true"></i></div>
+              <div class="wacc-icon yucho"><i class="ti ti-coin" aria-hidden="true"></i></div>
               <div>
                 <div class="wacc-name">ゆうちょ</div>
                 <div class="wacc-updated" id="w-yucho-date">—</div>
@@ -579,7 +579,13 @@ const DAY_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Sat
 const MON_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 let dark = false, curMonth = 0;
 
-function gd(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch(e) { return []; } }
+function gd(k) {
+  try {
+    const raw = localStorage.getItem(k);
+    if (raw === null) return k === 'wallet' || k === 'actuals' ? {} : [];
+    return JSON.parse(raw);
+  } catch(e) { return k === 'wallet' || k === 'actuals' ? {} : []; }
+}
 function sd(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
 
 function yen(n) { return '¥' + Math.round(n).toLocaleString('ja-JP'); }
