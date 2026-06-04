@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1D9E75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Income">
+<meta name="description" content="Track shifts, English lessons and gas expenses">
+<title>My Income</title>
+
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "My Income Tracker",
+  short_name: "My Income",
+  description: "Track shifts, English lessons and gas",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#ffffff",
+  theme_color: "#1D9E75",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231D9E75'/><text y='140' x='30' font-size='130' font-family='sans-serif'>💴</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231D9E75'/><text y='380' x='60' font-size='360' font-family='sans-serif'>💴</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --card2: #f0efe9;
+  --text: #111111;
+  --text2: #666666;
+  --text3: #aaaaaa;
+  --border: rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.18);
+  --green: #1D9E75;
+  --green-bg: #e1f5ee;
+  --green-text: #085041;
+  --amber: #9a6800;
+  --amber-bg: #fdf3dc;
+  --amber-text: #5a3800;
+  --blue: #1a6fb5;
+  --blue-bg: #e6f1fb;
+  --blue-text: #0c447c;
+  --red: #c0392b;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --r: 12px;
+  --r-sm: 8px;
+}
+.dark {
+  --bg: #0e0e0e;
+  --card: #1a1a1a;
+  --card2: #222222;
+  --text: #eeeeee;
+  --text2: #888888;
+  --text3: #555555;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.15);
+  --green: #5DCAA5;
+  --green-bg: #04342C;
+  --green-text: #9FE1CB;
+  --amber: #EF9F27;
+  --amber-bg: #3a2000;
+  --amber-text: #FAC775;
+  --blue: #5aa3e8;
+  --blue-bg: #0a2a4a;
+  --blue-text: #B5D4F4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* App shell */
+.app { display: flex; flex-direction: column; height: 100vh; max-width: 430px; margin: 0 auto; position: relative; }
+.scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 90px; }
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* Bottom nav */
+.bnav {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--card); border-top: 0.5px solid var(--border2);
+  padding: 8px 0 max(10px, env(safe-area-inset-bottom));
+  position: sticky; bottom: 0; z-index: 100;
+}
+.nb {
+  background: none; border: none; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; padding: 4px 2px; cursor: pointer;
+  color: var(--text3); font-family: var(--font); font-size: 10px; font-weight: 400;
+  transition: color 0.15s;
+}
+.nb i { font-size: 22px; }
+.nb.active { color: var(--green); }
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Topbar */
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.pg-title { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; }
+.tbtn {
+  background: var(--card2); border: 0.5px solid var(--border2);
+  border-radius: 99px; padding: 6px 13px; font-size: 12px;
+  color: var(--text2); cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 5px;
+}
+.tbtn:active { opacity: 0.7; }
+
+/* Cards */
+.card {
+  background: var(--card); border: 0.5px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
+}
+.card2 { background: var(--card2); border-radius: var(--r); padding: 13px 15px; margin-bottom: 12px; }
+
+/* Hero date */
+.hero-date { font-size: 28px; font-weight: 300; letter-spacing: -0.5px; }
+.hero-weekday { font-size: 13px; color: var(--text2); margin-top: 2px; margin-bottom: 14px; }
+.hero-divider { border: none; border-top: 0.5px solid var(--border); margin-bottom: 14px; }
+.income-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ic { background: var(--card2); border-radius: var(--r-sm); padding: 11px 12px; }
+.ic-lbl { font-size: 10px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.ic-val { font-size: 18px; font-weight: 500; }
+.ic-val.g { color: var(--green); }
+.ic-val.b { color: var(--blue); }
+
+/* Form */
+.card-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.f { }
+.f label { font-size: 10px; color: var(--text3); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.f input, .f select {
+  width: 100%; background: var(--bg); border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm); padding: 9px 11px; font-size: 13px;
+  color: var(--text); font-family: var(--font); outline: none;
+  -webkit-appearance: none;
+}
+.f input:focus, .f select:focus { border-color: var(--green); }
+.f input[readonly] { color: var(--text2); background: var(--card2); }
+.preview-pill {
+  background: var(--amber-bg); border-radius: var(--r-sm); padding: 9px 12px;
+  margin-bottom: 8px; display: none; justify-content: space-between; align-items: center;
+}
+.preview-pill.show { display: flex; }
+.pp-lbl { font-size: 10px; color: var(--amber-text); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+.pp-val { font-size: 16px; font-weight: 500; color: var(--amber-text); font-family: var(--mono); }
+.btn-add {
+  width: 100%; background: var(--green); color: #fff; border: none;
+  border-radius: var(--r-sm); padding: 11px; font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: var(--font); letter-spacing: -0.1px;
+  transition: opacity 0.15s;
+}
+.btn-add:active { opacity: 0.8; }
+
+/* Month nav */
+.month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.m-title { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; }
+.arrows { display: flex; gap: 6px; }
+.arr {
+  background: var(--card2); border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm); width: 36px; height: 36px; font-size: 18px;
+  cursor: pointer; color: var(--text2); display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.arr:hover { background: var(--card); }
+.arr:disabled { opacity: 0.3; cursor: default; }
+
+/* Stats */
+.stat3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 12px; }
+.sc { background: var(--card2); border-radius: var(--r-sm); padding: 10px 11px; }
+.sc-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
+.sc-val { font-size: 15px; font-weight: 500; font-family: var(--mono); }
+.sc-val.g { color: var(--green); }
+.sc-val.a { color: var(--amber); }
+
+/* Actual received */
+.actual-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.actual-big { font-size: 22px; font-weight: 500; color: var(--green); font-family: var(--mono); margin-bottom: 2px; }
+.actual-diff { font-size: 11px; margin-bottom: 10px; }
+.actual-pending { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+.inp-row { display: flex; gap: 6px; }
+.inp-row input {
+  flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
+  color: var(--text); font-family: var(--mono); outline: none;
+}
+.inp-row input:focus { border-color: var(--green); }
+.inp-row button {
+  background: var(--green); color: #fff; border: none;
+  border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: var(--font);
+}
+
+/* Shift table */
+.sec-hd { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 8px; }
+.shift-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.shift-tbl th { font-size: 10px; color: var(--text3); font-weight: 400; padding: 0 4px 7px; text-align: left; border-bottom: 0.5px solid var(--border2); letter-spacing: 0.03em; text-transform: uppercase; }
+.shift-tbl th.r { text-align: right; }
+.shift-tbl td { padding: 9px 4px; border-bottom: 0.5px solid var(--border); font-size: 12px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shift-tbl td.r { text-align: right; font-family: var(--mono); }
+.shift-tbl tr:last-child td { border-bottom: none; }
+.shift-tbl tr.dim td { color: var(--text3); }
+.dbadge { display: inline-block; font-size: 9px; background: var(--card2); border-radius: 3px; padding: 1px 4px; margin-left: 3px; color: var(--text2); }
+.dbadge.we { background: var(--green-bg); color: var(--green-text); }
+.del-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 15px; padding: 0 3px; border-radius: 3px; }
+.del-btn:hover { color: var(--red); }
+.tot-row td { font-size: 11px; color: var(--text2); padding-top: 10px; border-top: 0.5px solid var(--border2) !important; border-bottom: none !important; font-family: var(--mono); }
+
+/* Entries (English / Gas) */
+.mgrp { font-size: 11px; font-weight: 500; color: var(--text2); padding: 8px 0 4px; border-bottom: 0.5px solid var(--border2); margin-bottom: 3px; }
+.entry { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+.entry:last-of-type { border-bottom: none; }
+.e-main { font-size: 13px; font-weight: 500; }
+.e-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.e-amt { font-size: 14px; font-weight: 500; font-family: var(--mono); }
+.total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; border-top: 0.5px solid var(--border2); margin-top: 4px; }
+
+/* Gas banner */
+.gas-banner { background: var(--green-bg); border-radius: var(--r); padding: 13px 15px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+.gb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+.gb-val { font-size: 22px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
+
+/* Dot */
+.dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
+.dot.done { background: var(--green); }
+.dot.up { background: var(--text3); }
+
+/* Empty */
+.empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px 0; line-height: 1.6; }
+
+/* Toast */
+.toast-wrap { text-align: center; min-height: 30px; margin-top: 6px; }
+.toast {
+  background: var(--text); color: var(--card); padding: 6px 18px;
+  border-radius: 99px; font-size: 11px; opacity: 0; transition: opacity 0.2s;
+  pointer-events: none; display: inline-block;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="scroll-area" id="scroll">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="topbar">
+        <div class="pg-title">Dashboard</div>
+        <button class="tbtn" id="tbtn" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i> Dark</button>
+      </div>
+      <div class="card">
+        <div class="hero-date" id="h-date"></div>
+        <div class="hero-weekday" id="h-weekday"></div>
+        <hr class="hero-divider">
+        <div class="income-grid" id="h-income"></div>
+      </div>
+      <div class="card2">
+        <div class="card-label"><i class="ti ti-clock" aria-hidden="true"></i> Log a shift</div>
+        <div class="frow">
+          <div class="f"><label>Date</label><input type="date" id="ql-date" oninput="qlDate()"></div>
+          <div class="f"><label>Day</label><input id="ql-day" readonly placeholder="Auto"></div>
+        </div>
+        <div class="frow">
+          <div class="f"><label>Time in</label><input type="time" id="ql-in" value="21:00" oninput="qlCalc()"></div>
+          <div class="f"><label>Time out</label><input type="time" id="ql-out" value="00:00" oninput="qlCalc()"></div>
+        </div>
+        <div class="preview-pill" id="ql-prev">
+          <div><div class="pp-lbl">This shift</div><div class="pp-val" id="ql-pval">—</div></div>
+          <div><div class="pp-lbl">Hours</div><div class="pp-val" id="ql-phrs">—</div></div>
+        </div>
+        <div class="frow" style="margin-bottom:10px">
+          <div class="f"><label>Month</label>
+            <select id="ql-month">
+              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+            </select>
+          </div>
+          <div class="f"><label>Status</label>
+            <select id="ql-done"><option value="1">Done ✓</option><option value="0">Upcoming</option></select>
+          </div>
+        </div>
+        <button class="btn-add" onclick="qlSubmit()"><i class="ti ti-plus" aria-hidden="true"></i> Add shift</button>
+      </div>
+      <div class="toast-wrap"><span class="toast" id="toast"></span></div>
+    </div>
+
+    <!-- MONTHS -->
+    <div class="page" id="page-months">
+      <div class="topbar">
+        <div class="pg-title">はま寿司</div>
+        <button class="tbtn" id="tbtn2" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
+      </div>
+      <div class="month-nav">
+        <div class="m-title" id="m-title">—</div>
+        <div class="arrows">
+          <button class="arr" id="arr-p" onclick="chMonth(-1)">‹</button>
+          <button class="arr" id="arr-n" onclick="chMonth(1)">›</button>
+        </div>
+      </div>
+      <div class="stat3" id="m-stats"></div>
+      <div class="card" id="m-actual"></div>
+      <div class="sec-hd">Shifts</div>
+      <table class="shift-tbl">
+        <colgroup>
+          <col style="width:29%"><col style="width:28%">
+          <col style="width:15%"><col style="width:21%"><col style="width:7%">
+        </colgroup>
+        <thead><tr>
+          <th>Date</th><th>In → Out</th>
+          <th class="r">Hrs</th><th class="r">予想給料</th><th></th>
+        </tr></thead>
+        <tbody id="m-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="page" id="page-english">
+      <div class="topbar">
+        <div class="pg-title">English</div>
+        <button class="tbtn" id="tbtn3" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
+      </div>
+      <div class="card2">
+        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Add payment</div>
+        <div class="frow">
+          <div class="f"><label>Month</label>
+            <select id="e-month">
+              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+            </select>
+          </div>
+          <div class="f"><label>Amount (¥)</label><input type="number" id="e-amt" placeholder="19080"></div>
+        </div>
+        <div class="f" style="margin-bottom:10px">
+          <label>Note (optional)</label>
+          <input type="text" id="e-note" placeholder="e.g. enrollment fee">
+        </div>
+        <button class="btn-add" onclick="addEnglish()">Add payment</button>
+      </div>
+      <div id="english-list"></div>
+    </div>
+
+    <!-- GAS -->
+    <div class="page" id="page-gas">
+      <div class="topbar">
+        <div class="pg-title">Gasoline</div>
+        <button class="tbtn" id="tbtn4" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
+      </div>
+      <div id="gas-banner"></div>
+      <div class="card2">
+        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Log refuel</div>
+        <div class="frow">
+          <div class="f"><label>Date</label><input type="date" id="g-date"></div>
+          <div class="f"><label>Cost (¥)</label><input type="number" id="g-cost" placeholder="3500"></div>
+        </div>
+        <div class="frow" style="margin-bottom:10px">
+          <div class="f"><label>Odometer (km)</label><input type="number" id="g-odo" placeholder="12500"></div>
+          <div class="f"><label>Note</label><input type="text" id="g-note" placeholder="optional"></div>
+        </div>
+        <button class="btn-add" onclick="addGas()">Add refuel</button>
+      </div>
+      <div id="gas-list"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bnav">
+    <button class="nb active" onclick="goPage('home')" aria-label="Home">
+      <i class="ti ti-home" aria-hidden="true"></i><span>Home</span>
+    </button>
+    <button class="nb" onclick="goPage('months')" aria-label="Shifts">
+      <i class="ti ti-calendar" aria-hidden="true"></i><span>Shifts</span>
+    </button>
+    <button class="nb" onclick="goPage('english')" aria-label="English">
+      <i class="ti ti-school" aria-hidden="true"></i><span>English</span>
+    </button>
+    <button class="nb" onclick="goPage('gas')" aria-label="Gas">
+      <i class="ti ti-gas-station" aria-hidden="true"></i><span>Gas</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Service Worker ──────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'income-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html'))));
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+
+// ── Constants ───────────────────────────────────────────────────
+const DAYS = ['日','月','火','水','木','金','土'];
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const DAY_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+let dark = false, curMonth = 0;
+
+// ── Storage ─────────────────────────────────────────────────────
+function gd(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch(e) { return []; } }
+function sd(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+// ── Helpers ─────────────────────────────────────────────────────
+function yen(n) { return '¥' + Math.round(n).toLocaleString('ja-JP'); }
+function fmtH(m) { const h = Math.floor(m/60), mm = Math.round(m%60); return h + ':' + (mm < 10 ? '0' : '') + mm; }
+function tH(t) { if (!t) return 0; const [h, m] = t.split(':').map(Number); return h + m/60; }
+function sMins(tin, tout) {
+  if (!tin || !tout) return 0;
+  let i = tH(tin), o = tH(tout);
+  if (o <= i) o += 24;
+  return Math.round((o - i) * 60);
+}
+function sPay(day, tin, tout) {
+  if (!day || !tin || !tout) return 0;
+  const we = day === '土' || day === '日';
+  const base = we ? 1270 : 1200;
+  let i = tH(tin), o = tH(tout);
+  if (o <= i) o += 24;
+  const pre = Math.max(0, Math.min(22, o) - i) * base;
+  const af = Math.max(0, o - Math.max(i, 22));
+  const f2 = Math.min(2, af) * base * 1.25;
+  const ov = Math.max(0, af - 2);
+  return Math.round(pre + f2 + Math.floor(ov) * (base * 1.25 + 150) + (ov % 1) * base * 1.25);
+}
+function mEst(shifts) {
+  const tot = shifts.filter(s => s.done).reduce((s, x) => s + sPay(x.day, x.tin, x.tout), 0);
+  return Math.round(tot - 200 - Math.round(tot * 0.0306));
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── Theme ────────────────────────────────────────────────────────
+function toggleTheme() {
+  dark = !dark;
+  document.getElementById('app').classList.toggle('dark', dark);
+  const ic = dark ? '<i class="ti ti-sun" aria-hidden="true"></i> Light' : '<i class="ti ti-moon" aria-hidden="true"></i> Dark';
+  document.getElementById('tbtn').innerHTML = ic;
+  ['tbtn2','tbtn3','tbtn4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = dark ? '<i class="ti ti-sun" aria-hidden="true"></i>' : '<i class="ti ti-moon" aria-hidden="true"></i>';
+  });
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+}
+
+// ── Navigation ───────────────────────────────────────────────────
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  ['home','months','english','gas'].forEach((n,i) => {
+    if (n === name) document.querySelectorAll('.nb')[i].classList.add('active');
+  });
+  document.getElementById('scroll').scrollTop = 0;
+  if (name === 'home') renderHome();
+  else if (name === 'months') renderMonths();
+  else if (name === 'english') renderEnglish();
+  else renderGas();
+}
+
+// ── Home ─────────────────────────────────────────────────────────
+function renderHome() {
+  const now = new Date();
+  document.getElementById('h-date').textContent = `${MON_EN[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  document.getElementById('h-weekday').textContent = DAY_EN[now.getDay()];
+  const yr = now.getFullYear().toString();
+  const actuals = gd('actuals') || {};
+  const english = gd('english') || [];
+  let shiftTotal = 0;
+  MONTHS.forEach(m => { const k = yr+'-'+m; if (actuals[k]) shiftTotal += actuals[k]; });
+  const engTotal = english.filter(e => e.year === yr).reduce((s, x) => s + (x.amount || 0), 0);
+  document.getElementById('h-income').innerHTML = `
+    <div class="ic"><div class="ic-lbl">はま寿司 ${yr}</div><div class="ic-val g">${yen(shiftTotal)}</div></div>
+    <div class="ic"><div class="ic-lbl">English ${yr}</div><div class="ic-val b">${yen(engTotal)}</div></div>
+  `;
+  const el = document.getElementById('ql-date');
+  if (!el.value) {
+    const y = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+    el.value = `${y}-${mo}-${d}`;
+    document.getElementById('ql-day').value = DAYS[now.getDay()];
+    document.getElementById('ql-month').value = (now.getMonth()+1) + '月';
+    qlCalc();
+  }
+}
+function qlDate() {
+  const v = document.getElementById('ql-date').value; if (!v) return;
+  const d = new Date(v);
+  document.getElementById('ql-day').value = DAYS[d.getDay()];
+  document.getElementById('ql-month').value = (d.getMonth()+1) + '月';
+  qlCalc();
+}
+function qlCalc() {
+  const day = document.getElementById('ql-day').value;
+  const tin = document.getElementById('ql-in').value, tout = document.getElementById('ql-out').value;
+  const p = sPay(day, tin, tout), m = sMins(tin, tout);
+  const box = document.getElementById('ql-prev');
+  if (p && m) {
+    document.getElementById('ql-pval').textContent = yen(p);
+    document.getElementById('ql-phrs').textContent = fmtH(m);
+    box.classList.add('show');
+  } else box.classList.remove('show');
+}
+function qlSubmit() {
+  const date = document.getElementById('ql-date').value;
+  const tin = document.getElementById('ql-in').value, tout = document.getElementById('ql-out').value;
+  const month = document.getElementById('ql-month').value;
+  const done = document.getElementById('ql-done').value === '1';
+  if (!date || !tin || !tout) { toast('Fill in all fields'); return; }
+  const day = DAYS[new Date(date).getDay()];
+  const shifts = gd('shifts');
+  shifts.push({ id: Date.now(), month, date, day, done, tin, tout });
+  sd('shifts', shifts);
+  document.getElementById('ql-date').value = '';
+  document.getElementById('ql-day').value = '';
+  document.getElementById('ql-in').value = '21:00';
+  document.getElementById('ql-out').value = '00:00';
+  document.getElementById('ql-prev').classList.remove('show');
+  toast('Shift added ✓');
+  renderHome();
+}
+
+// ── Months ───────────────────────────────────────────────────────
+function getMonths() { const seen = new Set(gd('shifts').map(s => s.month)); return MONTHS.filter(m => seen.has(m)); }
+function chMonth(d) { const ms = getMonths(); curMonth = Math.max(0, Math.min(ms.length-1, curMonth+d)); renderMonths(); }
+function renderMonths() {
+  const ms = getMonths();
+  if (!ms.length) { document.getElementById('m-title').textContent = 'No data'; return; }
+  const month = ms[curMonth];
+  document.getElementById('m-title').textContent = month;
+  document.getElementById('arr-p').disabled = curMonth === 0;
+  document.getElementById('arr-n').disabled = curMonth === ms.length - 1;
+  const shifts = gd('shifts').filter(s => s.month === month).sort((a,b) => a.date.localeCompare(b.date));
+  const actuals = gd('actuals') || {};
+  const yr = shifts[0] ? shifts[0].date.slice(0,4) : new Date().getFullYear().toString();
+  const akey = yr + '-' + month;
+  const actual = actuals[akey] != null ? actuals[akey] : null;
+  const done = shifts.filter(s => s.done);
+  const totMins = done.reduce((s, x) => s + sMins(x.tin, x.tout), 0);
+  const est = mEst(shifts);
+  document.getElementById('m-stats').innerHTML = `
+    <div class="sc"><div class="sc-lbl">Shifts</div><div class="sc-val">${done.length}日</div></div>
+    <div class="sc"><div class="sc-lbl">Hours</div><div class="sc-val a">${fmtH(totMins)}</div></div>
+    <div class="sc"><div class="sc-lbl">予想収入</div><div class="sc-val g">${yen(est)}</div></div>
+  `;
+  const diff = actual != null ? actual - est : null;
+  document.getElementById('m-actual').innerHTML = `
+    <div class="actual-lbl">実際の給料 — received salary</div>
+    ${actual != null
+      ? `<div class="actual-big">${yen(actual)}</div>
+         <div class="actual-diff" style="color:${diff >= 0 ? 'var(--green)' : 'var(--amber)'}">
+           ${diff >= 0 ? '+' : ''}${yen(diff)} vs estimated
+         </div>`
+      : `<div class="actual-pending">Not received yet</div>`}
+    <div class="inp-row">
+      <input type="number" id="act-inp" value="${actual != null ? actual : ''}" placeholder="Enter actual amount">
+      <button onclick="saveActual('${akey}')">Save</button>
+    </div>
+  `;
+  let rows = '';
+  if (!shifts.length) {
+    rows = `<tr><td colspan="5"><div class="empty">No shifts this month</div></td></tr>`;
+  } else {
+    let tMins = 0, tPay = 0;
+    shifts.forEach(s => {
+      const pay = sPay(s.day, s.tin, s.tout);
+      const mins = sMins(s.tin, s.tout);
+      if (s.done) { tMins += mins; tPay += pay; }
+      const we = s.day === '土' || s.day === '日';
+      rows += `<tr class="${s.done ? '' : 'dim'}">
+        <td><span class="dot ${s.done ? 'done' : 'up'}"></span>${s.date.slice(5).replace('-','/')}<span class="dbadge ${we ? 'we' : ''}">${s.day}</span></td>
+        <td>${s.tin}→${s.tout}</td>
+        <td class="r">${mins ? fmtH(mins) : '—'}</td>
+        <td class="r" style="color:${s.done ? 'var(--green)' : 'var(--amber)'}">${pay ? yen(pay) : '—'}</td>
+        <td><button class="del-btn" onclick="delShift(${s.id})" aria-label="delete">×</button></td>
+      </tr>`;
+    });
+    rows += `<tr class="tot-row">
+      <td colspan="2">${done.length} shifts done</td>
+      <td class="r" style="color:var(--amber)">${fmtH(tMins)}</td>
+      <td class="r" style="color:var(--green)">${yen(est)}</td>
+      <td></td>
+    </tr>`;
+  }
+  document.getElementById('m-tbody').innerHTML = rows;
+}
+function saveActual(akey) {
+  const v = parseFloat(document.getElementById('act-inp').value);
+  if (isNaN(v)) { toast('Enter valid amount'); return; }
+  const a = gd('actuals') || {}; a[akey] = v; sd('actuals', a);
+  renderMonths(); renderHome();
+}
+function delShift(id) {
+  sd('shifts', gd('shifts').filter(s => s.id !== id));
+  renderMonths(); renderHome();
+}
+
+// ── English ──────────────────────────────────────────────────────
+function renderEnglish() {
+  const items = (gd('english') || []).sort((a,b) => (a.year+a.month).localeCompare(b.year+b.month));
+  const el = document.getElementById('english-list');
+  const total = items.reduce((s, x) => s + (x.amount || 0), 0);
+  if (!items.length) { el.innerHTML = '<div class="empty">No payments yet</div>'; return; }
+  let lastG = '', html = '';
+  items.forEach(i => {
+    const g = (i.year || '2026') + ' · ' + i.month;
+    if (g !== lastG) { html += `<div class="mgrp">${g}</div>`; lastG = g; }
+    html += `<div class="entry">
+      <div><div class="e-main">${i.note || i.month}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="e-amt" style="color:var(--blue)">${yen(i.amount)}</div>
+        <button class="del-btn" onclick="delEnglish(${i.id})" aria-label="delete">×</button>
+      </div>
+    </div>`;
+  });
+  html += `<div class="total-row">
+    <span style="font-size:11px;color:var(--text3)">Total</span>
+    <span style="font-size:16px;font-weight:500;color:var(--blue);font-family:var(--mono)">${yen(total)}</span>
+  </div>`;
+  el.innerHTML = html;
+}
+function addEnglish() {
+  const month = document.getElementById('e-month').value;
+  const amount = parseFloat(document.getElementById('e-amt').value);
+  const note = document.getElementById('e-note').value.trim();
+  if (isNaN(amount)) { toast('Enter an amount'); return; }
+  const items = gd('english') || [];
+  items.push({ id: Date.now(), year: new Date().getFullYear().toString(), month, amount, note });
+  sd('english', items);
+  document.getElementById('e-amt').value = '';
+  document.getElementById('e-note').value = '';
+  toast('Saved!'); renderEnglish(); renderHome();
+}
+function delEnglish(id) {
+  sd('english', (gd('english') || []).filter(x => x.id !== id));
+  renderEnglish(); renderHome();
+}
+
+// ── Gas ──────────────────────────────────────────────────────────
+function renderGas() {
+  const items = (gd('gas') || []).sort((a,b) => a.date.localeCompare(b.date));
+  const el = document.getElementById('gas-list');
+  const banner = document.getElementById('gas-banner');
+  if (!items.length) {
+    banner.innerHTML = '';
+    el.innerHTML = '<div class="empty">No refuels yet.<br>Log your odometer each fill-up<br>to track km per refuel.</div>';
+    return;
+  }
+  const dists = [];
+  for (let i = 1; i < items.length; i++) {
+    const d = items[i].odo - items[i-1].odo;
+    if (d > 0) dists.push(d);
+  }
+  const avg = dists.length ? Math.round(dists.reduce((a,b) => a+b) / dists.length) : null;
+  banner.innerHTML = avg
+    ? `<div class="gas-banner">
+        <div><div class="gb-lbl">Avg km per refuel · ${items.length} fill-ups</div><div class="gb-val">${avg} km</div></div>
+        <i class="ti ti-gas-station" style="font-size:32px;opacity:0.5;color:var(--green-text)" aria-hidden="true"></i>
+       </div>` : '';
+  let html = '';
+  [...items].reverse().forEach(g => {
+    const idx = items.findIndex(x => x.id === g.id);
+    const km = idx > 0 ? g.odo - items[idx-1].odo : null;
+    html += `<div class="entry">
+      <div>
+        <div class="e-main">${g.date}</div>
+        <div class="e-sub">Odo: ${g.odo ? g.odo.toLocaleString() + ' km' : '—'}${km && km > 0 ? ' · +' + km + ' km since last' : ''}${g.note ? ' · ' + g.note : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="e-amt">${yen(g.cost)}</div>
+        <button class="del-btn" onclick="delGas(${g.id})" aria-label="delete">×</button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+function addGas() {
+  const date = document.getElementById('g-date').value;
+  const cost = parseFloat(document.getElementById('g-cost').value);
+  const odo = parseFloat(document.getElementById('g-odo').value);
+  const note = document.getElementById('g-note').value.trim();
+  if (!date || isNaN(cost) || isNaN(odo)) { toast('Fill date, cost & odometer'); return; }
+  const items = gd('gas') || [];
+  items.push({ id: Date.now(), date, cost, odo, note });
+  sd('gas', items);
+  document.getElementById('g-date').value = '';
+  document.getElementById('g-cost').value = '';
+  document.getElementById('g-odo').value = '';
+  toast('Saved!'); renderGas();
+}
+function delGas(id) { sd('gas', (gd('gas') || []).filter(x => x.id !== id)); renderGas(); }
+
+// ── Seed data ────────────────────────────────────────────────────
+function seed() {
+  if ((gd('shifts') || []).length) return;
+  const raw = [
+    ['1月','2026-01-01','木',true,'20:00','22:10'],['1月','2026-01-04','日',true,'21:00','00:10'],
+    ['1月','2026-01-06','火',true,'21:00','00:05'],['1月','2026-01-08','木',true,'21:00','00:00'],
+    ['1月','2026-01-11','日',true,'21:00','01:05'],['1月','2026-01-13','火',true,'21:00','23:46'],
+    ['1月','2026-01-15','木',true,'21:00','00:00'],['1月','2026-01-18','日',true,'21:00','00:08'],
+    ['1月','2026-01-20','火',true,'21:00','00:07'],['1月','2026-01-22','木',true,'21:00','00:05'],
+    ['1月','2026-01-25','日',true,'21:00','00:01'],['1月','2026-01-27','火',true,'21:00','00:06'],
+    ['1月','2026-01-29','木',true,'21:00','00:10'],
+    ['2月','2026-02-01','日',true,'21:00','01:15'],['2月','2026-02-03','火',true,'21:00','00:08'],
+    ['2月','2026-02-05','木',true,'21:00','01:02'],['2月','2026-02-08','日',true,'21:00','01:05'],
+    ['2月','2026-02-10','火',true,'21:00','01:16'],['2月','2026-02-12','木',true,'21:00','01:05'],
+    ['2月','2026-02-15','日',true,'21:00','23:46'],['2月','2026-02-17','火',true,'21:00','00:05'],
+    ['2月','2026-02-19','木',true,'21:00','00:02'],['2月','2026-02-22','日',true,'21:00','01:15'],
+    ['2月','2026-02-24','火',true,'21:00','00:04'],['2月','2026-02-26','木',true,'21:00','01:05'],
+    ['3月','2026-03-01','日',true,'21:00','00:35'],['3月','2026-03-03','火',true,'21:00','00:00'],
+    ['3月','2026-03-05','木',true,'21:00','00:00'],['3月','2026-03-08','日',true,'21:00','00:00'],
+    ['3月','2026-03-10','火',true,'21:00','00:00'],['3月','2026-03-12','木',true,'21:00','00:00'],
+    ['3月','2026-03-15','日',true,'21:00','01:19'],['3月','2026-03-17','火',true,'21:00','00:05'],
+    ['3月','2026-03-19','木',true,'21:00','00:08'],['3月','2026-03-22','日',true,'21:00','01:04'],
+    ['3月','2026-03-24','火',true,'21:00','00:03'],['3月','2026-03-26','木',true,'21:00','00:06'],
+    ['3月','2026-03-29','日',true,'21:00','01:20'],['3月','2026-03-31','火',true,'21:00','01:04'],
+    ['4月','2026-04-02','木',true,'21:00','01:05'],['4月','2026-04-05','日',true,'21:00','01:02'],
+    ['4月','2026-04-07','火',true,'21:00','00:05'],['4月','2026-04-09','木',true,'21:00','00:04'],
+    ['4月','2026-04-12','日',true,'21:00','00:03'],['4月','2026-04-14','火',true,'21:00','00:05'],
+    ['4月','2026-04-16','木',true,'21:00','00:00'],['4月','2026-04-19','日',true,'21:00','23:55'],
+    ['4月','2026-04-21','火',true,'21:00','00:06'],['4月','2026-04-23','木',true,'21:00','23:46'],
+    ['4月','2026-04-26','日',true,'21:00','00:10'],['4月','2026-04-28','火',true,'21:00','01:06'],
+    ['4月','2026-04-30','木',true,'21:00','00:03'],
+    ['5月','2026-05-03','日',true,'21:00','00:10'],['5月','2026-05-05','火',true,'21:00','00:07'],
+    ['5月','2026-05-07','木',true,'21:00','00:08'],['5月','2026-05-10','日',true,'21:00','01:00'],
+    ['5月','2026-05-12','火',true,'21:00','00:02'],['5月','2026-05-14','木',true,'21:00','00:02'],
+    ['5月','2026-05-17','日',true,'21:00','01:04'],['5月','2026-05-19','火',true,'21:00','23:55'],
+    ['5月','2026-05-21','木',true,'21:00','01:05'],['5月','2026-05-24','日',true,'21:00','01:03'],
+    ['5月','2026-05-26','火',true,'21:00','23:55'],['5月','2026-05-28','木',true,'21:00','00:05'],
+    ['5月','2026-05-31','日',true,'21:00','00:51'],
+    ['6月','2026-06-02','火',false,'21:00','00:00'],['6月','2026-06-04','木',false,'21:00','00:00'],
+    ['6月','2026-06-07','日',false,'21:00','00:00'],['6月','2026-06-09','火',false,'21:00','00:00'],
+    ['6月','2026-06-11','木',false,'21:00','00:00'],['6月','2026-06-14','日',false,'21:00','00:00'],
+    ['6月','2026-06-16','火',false,'21:00','00:00'],['6月','2026-06-18','木',false,'21:00','00:00'],
+    ['6月','2026-06-21','日',false,'21:00','00:00'],['6月','2026-06-23','火',false,'21:00','00:00'],
+    ['6月','2026-06-25','木',false,'21:00','00:00'],['6月','2026-06-28','日',false,'21:00','00:00'],
+    ['6月','2026-06-30','火',false,'21:00','00:00'],
+  ];
+  sd('shifts', raw.map((r,i) => ({ id: i+1, month: r[0], date: r[1], day: r[2], done: r[3], tin: r[4], tout: r[5] })));
+  sd('actuals', { '2026-1月': 60783, '2026-2月': 66198, '2026-3月': 67316, '2026-4月': 62629 });
+  sd('english', [
+    { id:1, year:'2026', month:'1月', amount:19080, note:'' },
+    { id:2, year:'2026', month:'1月', amount:83400, note:'Enrollment fee' },
+    { id:3, year:'2026', month:'2月', amount:19080, note:'' },
+    { id:4, year:'2026', month:'3月', amount:19080, note:'' },
+    { id:5, year:'2026', month:'4月', amount:25080, note:'' },
+    { id:6, year:'2026', month:'5月', amount:1080, note:'' },
+  ]);
+  sd('gas', [
+    { id:1, date:'2026-01-12', cost:3666, odo:10427, note:'' },
+    { id:2, date:'2026-01-27', cost:1806, odo:10608, note:'' },
+    { id:3, date:'2026-03-17', cost:1000, odo:11163, note:'' },
+    { id:4, date:'2026-03-23', cost:4095, odo:11258, note:'' },
+    { id:5, date:'2026-04-26', cost:4071, odo:11881, note:'' },
+  ]);
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+if (localStorage.getItem('theme') === 'dark') {
+  dark = true;
+  document.getElementById('app').classList.add('dark');
+  document.getElementById('tbtn').innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i> Light';
+  ['tbtn2','tbtn3','tbtn4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i>';
+  });
+}
+seed();
+const todayM = (new Date().getMonth() + 1) + '月';
+const ams = getMonths();
+const ti = ams.indexOf(todayM);
+curMonth = ti >= 0 ? ti : Math.max(0, ams.length - 1);
+renderHome();
+</script>
+</body>
+</html>
