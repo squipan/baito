@@ -394,12 +394,16 @@ body {
 .salary-month-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
 .smc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .smc-month { font-size: 15px; font-weight: 500; color: var(--text); }
-.smc-total { font-size: 18px; font-weight: 500; font-family: var(--mono); color: var(--green); }
+.smc-total { font-size: 18px; font-weight: 500; font-family: var(--mono); }
+.smc-total.pos { color: var(--green); }
+.smc-total.neg { color: var(--red); }
 .smc-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-top: 0.5px solid var(--border); }
 .smc-lbl { font-size: 12px; color: var(--text2); }
 .smc-val { font-size: 13px; font-weight: 500; font-family: var(--mono); color: var(--text); }
 .smc-val.pos { color: var(--green); }
 .smc-val.neg { color: var(--red); }
+.smc-savings-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1.5px solid var(--border2); margin-top: 2px; }
+.smc-savings-lbl { font-size: 12px; font-weight: 600; color: var(--text); }
 .salary-year-banner { background: var(--green-bg); border-radius: var(--r); padding: 14px 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
 .syb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
 .syb-val { font-size: 24px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
@@ -614,6 +618,30 @@ html.dark-html { background: #0e0e0e; }
           </div>
         </div>
 
+        <!-- 現金 Cash -->
+        <div>
+          <div class="wacc">
+            <div class="wacc-left">
+              <div class="wacc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-cash" aria-hidden="true"></i></div>
+              <div>
+                <div class="wacc-name">現金 / Cash</div>
+                <div class="wacc-updated" id="w-cash-date">—</div>
+              </div>
+            </div>
+            <div class="wacc-right">
+              <div class="wacc-amt" style="color:var(--green)" id="w-cash-val">—</div>
+              <button class="wacc-edit" onclick="toggleEdit('cash')" aria-label="edit cash"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="wallet-edit-form" id="edit-cash">
+            <div class="we-lbl">Current cash on hand (¥)</div>
+            <div class="we-row">
+              <input type="number" id="inp-cash" placeholder="e.g. 15000">
+              <button onclick="saveWallet('cash')">Save</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
@@ -626,9 +654,30 @@ html.dark-html { background: #0e0e0e; }
         <div class="pg-title">Main Job</div>
         <button class="tbtn" id="tbtn6" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
       </div>
+
+      <!-- Defaults card -->
+      <div class="card2" id="sal-defaults-card">
+        <div class="card-label" style="justify-content:space-between;cursor:pointer" onclick="toggleSalDefaults()">
+          <span><i class="ti ti-settings" aria-hidden="true"></i> Default deductions</span>
+          <i class="ti ti-chevron-down" id="sal-def-chevron" aria-hidden="true"></i>
+        </div>
+        <div id="sal-defaults-body" style="display:none">
+          <div class="frow">
+            <div class="f"><label>Rent (¥)</label><input type="number" id="def-rent" placeholder="84000" oninput="saveDefaults()"></div>
+            <div class="f"><label>Car loan (¥)</label><input type="number" id="def-car" placeholder="40480" oninput="saveDefaults()"></div>
+          </div>
+          <div class="frow" style="margin-bottom:4px">
+            <div class="f"><label>Our wallets (¥)</label><input type="number" id="def-wallets" placeholder="70000" oninput="saveDefaults()"></div>
+            <div class="f"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">Changes apply to new entries only</div>
+        </div>
+      </div>
+
       <div id="salary-year-banner"></div>
+
       <div class="card2">
-        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Log salary</div>
+        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Log this month</div>
         <div class="frow">
           <div class="f"><label>Month</label>
             <select id="sal-month">
@@ -644,14 +693,22 @@ html.dark-html { background: #0e0e0e; }
           </div>
         </div>
         <div class="frow">
-          <div class="f"><label>Base salary (¥)</label><input type="number" id="sal-base" placeholder="250000"></div>
+          <div class="f"><label>Salary after tax (¥)</label><input type="number" id="sal-base" placeholder="256861"></div>
           <div class="f"><label>Bonus (¥)</label><input type="number" id="sal-bonus" placeholder="0"></div>
         </div>
-        <div class="frow" style="margin-bottom:10px">
-          <div class="f"><label>Tax / deductions (¥)</label><input type="number" id="sal-tax" placeholder="0"></div>
-          <div class="f"><label>Note</label><input type="text" id="sal-note" placeholder="optional"></div>
+        <div class="frow">
+          <div class="f"><label>Rent (¥)</label><input type="number" id="sal-rent" placeholder="84000"></div>
+          <div class="f"><label>Car loan (¥)</label><input type="number" id="sal-car" placeholder="40480"></div>
         </div>
-        <button class="btn-add" onclick="addSalary()"><i class="ti ti-plus" aria-hidden="true"></i> Add month</button>
+        <div class="frow">
+          <div class="f"><label>Our wallets (¥)</label><input type="number" id="sal-wallets" placeholder="70000"></div>
+          <div class="f"><label>Credit card (¥)</label><input type="number" id="sal-cc" placeholder="0"></div>
+        </div>
+        <div class="frow" style="margin-bottom:10px">
+          <div class="f"><label>Note</label><input type="text" id="sal-note" placeholder="optional"></div>
+          <div class="f"></div>
+        </div>
+        <button class="btn-add" onclick="addSalary()"><i class="ti ti-plus" aria-hidden="true"></i> Save month</button>
       </div>
       <div id="salary-list"></div>
     </div>
@@ -1042,44 +1099,82 @@ function renderWallet() {
   const wallet = gd('wallet') || {};
   const english = gd('english') || [];
   const engTotal = english.reduce((s, x) => s + (x.amount || 0), 0);
-  const ufj = wallet['ufj'];
+  const ufj   = wallet['ufj'];
   const yucho = wallet['yucho'];
-  const ufjAmt = ufj != null ? ufj.amount : null;
+  const cash  = wallet['cash'];
+  const ufjAmt   = ufj   != null ? ufj.amount   : null;
   const yuchoAmt = yucho != null ? yucho.amount : null;
-  document.getElementById('w-ufj-val').textContent = ufjAmt != null ? yen(ufjAmt) : '—';
-  document.getElementById('w-ufj-date').textContent = fmtDate(ufj ? ufj.ts : null);
-  document.getElementById('w-yucho-val').textContent = yuchoAmt != null ? yen(yuchoAmt) : '—';
+  const cashAmt  = cash  != null ? cash.amount  : null;
+  document.getElementById('w-ufj-val').textContent   = ufjAmt   != null ? yen(ufjAmt)   : '—';
+  document.getElementById('w-ufj-date').textContent  = fmtDate(ufj   ? ufj.ts   : null);
+  document.getElementById('w-yucho-val').textContent  = yuchoAmt != null ? yen(yuchoAmt) : '—';
   document.getElementById('w-yucho-date').textContent = fmtDate(yucho ? yucho.ts : null);
+  document.getElementById('w-cash-val').textContent   = cashAmt  != null ? yen(cashAmt)  : '—';
+  document.getElementById('w-cash-date').textContent  = fmtDate(cash  ? cash.ts  : null);
   document.getElementById('w-english-val').textContent = yen(engTotal);
-  const grand = (ufjAmt || 0) + (yuchoAmt || 0) + engTotal;
+  const grand = (ufjAmt || 0) + (yuchoAmt || 0) + (cashAmt || 0) + engTotal;
   document.getElementById('w-grand-val').textContent = yen(grand);
   const parts = [];
-  if (ufjAmt == null) parts.push('UFJ');
+  if (ufjAmt  == null) parts.push('UFJ');
   if (yuchoAmt == null) parts.push('ゆうちょ');
+  if (cashAmt  == null) parts.push('現金');
   document.getElementById('w-grand-sub').textContent = parts.length
-    ? parts.join(' & ') + ' balance not set — total may be incomplete'
+    ? parts.join(', ') + ' not set — total may be incomplete'
     : 'All accounts included';
 }
 
 
+// Salary defaults helpers
+function getSalDefaults() {
+  const d = gd('salDefaults') || {};
+  return {
+    rent:    d.rent    != null ? d.rent    : 84000,
+    car:     d.car     != null ? d.car     : 40480,
+    wallets: d.wallets != null ? d.wallets : 70000,
+  };
+}
+function saveDefaults() {
+  const rent    = parseFloat(document.getElementById('def-rent').value);
+  const car     = parseFloat(document.getElementById('def-car').value);
+  const wallets = parseFloat(document.getElementById('def-wallets').value);
+  const d = gd('salDefaults') || {};
+  if (!isNaN(rent))    d.rent    = rent;
+  if (!isNaN(car))     d.car     = car;
+  if (!isNaN(wallets)) d.wallets = wallets;
+  sd('salDefaults', d);
+}
+function toggleSalDefaults() {
+  const body = document.getElementById('sal-defaults-body');
+  const chev = document.getElementById('sal-def-chevron');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.className = open ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  if (!open) {
+    const d = getSalDefaults();
+    document.getElementById('def-rent').value    = d.rent;
+    document.getElementById('def-car').value     = d.car;
+    document.getElementById('def-wallets').value = d.wallets;
+  }
+}
 function addSalary() {
-  const month = document.getElementById('sal-month').value;
-  const year = document.getElementById('sal-year').value;
-  const base = parseFloat(document.getElementById('sal-base').value) || 0;
-  const bonus = parseFloat(document.getElementById('sal-bonus').value) || 0;
-  const tax = parseFloat(document.getElementById('sal-tax').value) || 0;
-  const note = document.getElementById('sal-note').value.trim();
-  if (!base) { toast('Enter base salary'); return; }
+  const month   = document.getElementById('sal-month').value;
+  const year    = document.getElementById('sal-year').value;
+  const base    = parseFloat(document.getElementById('sal-base').value) || 0;
+  const bonus   = parseFloat(document.getElementById('sal-bonus').value) || 0;
+  const rent    = parseFloat(document.getElementById('sal-rent').value) || 0;
+  const car     = parseFloat(document.getElementById('sal-car').value) || 0;
+  const wallets = parseFloat(document.getElementById('sal-wallets').value) || 0;
+  const cc      = parseFloat(document.getElementById('sal-cc').value) || 0;
+  const note    = document.getElementById('sal-note').value.trim();
+  if (!base) { toast('Enter salary'); return; }
   const items = gd('salary') || [];
-  // replace existing entry for same month/year
   const idx = items.findIndex(x => x.month === month && x.year === year);
-  const entry = { id: Date.now(), year, month, base, bonus, tax, note };
+  const entry = { id: Date.now(), year, month, base, bonus, rent, car, wallets, cc, note };
   if (idx >= 0) items[idx] = entry; else items.push(entry);
   sd('salary', items);
-  document.getElementById('sal-base').value = '';
-  document.getElementById('sal-bonus').value = '';
-  document.getElementById('sal-tax').value = '';
-  document.getElementById('sal-note').value = '';
+  ['sal-base','sal-bonus','sal-rent','sal-car','sal-wallets','sal-cc','sal-note'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
   toast('Saved!'); renderSalary();
 }
 function delSalary(id) {
@@ -1091,26 +1186,46 @@ function renderSalary() {
   const banner = document.getElementById('salary-year-banner');
   const el = document.getElementById('salary-list');
   const yr = new Date().getFullYear().toString();
-  const yearTotal = items.filter(x => x.year === yr).reduce((s, x) => s + x.base + x.bonus - x.tax, 0);
+  const yearSavings = items.filter(x => x.year === yr).reduce((s, x) => {
+    const total = x.base + (x.bonus||0);
+    const deduct = (x.rent||0) + (x.car||0) + (x.wallets||0) + (x.cc||0);
+    return s + (total - deduct);
+  }, 0);
   banner.innerHTML = items.length ? `<div class="salary-year-banner">
-    <div><div class="syb-lbl">Net income ${yr}</div><div class="syb-val">${yen(yearTotal)}</div></div>
+    <div><div class="syb-lbl">Total savings ${yr}</div><div class="syb-val">${yen(yearSavings)}</div></div>
     <i class="ti ti-briefcase" style="font-size:30px;opacity:0.5;color:var(--green-text)" aria-hidden="true"></i>
   </div>` : '';
+  // prefill defaults into form if empty
+  const d = getSalDefaults();
+  ['rent','car','wallets'].forEach(k => {
+    const el2 = document.getElementById('sal-' + (k === 'wallets' ? 'wallets' : k));
+    if (el2 && !el2.value) el2.placeholder = yen(d[k]).replace('¥','');
+  });
   if (!items.length) { el.innerHTML = '<div class="empty">No salary logged yet</div>'; return; }
   let html = '';
   items.forEach(x => {
-    const net = x.base + x.bonus - x.tax;
+    const total  = x.base + (x.bonus||0);
+    const deduct = (x.rent||0) + (x.car||0) + (x.wallets||0) + (x.cc||0);
+    const saving = total - deduct;
+    const savCls = saving >= 0 ? 'pos' : 'neg';
     html += `<div class="salary-month-card">
       <div class="smc-header">
         <div class="smc-month">${x.year} · ${x.month}${x.note ? ' <span style="font-size:11px;color:var(--text3)">— '+x.note+'</span>' : ''}</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="smc-total">${yen(net)}</div>
+          <div class="smc-total ${savCls}">${saving >= 0 ? '+' : ''}${yen(saving)}</div>
           <button class="del-btn" onclick="delSalary(${x.id})" aria-label="delete">×</button>
         </div>
       </div>
-      <div class="smc-row"><span class="smc-lbl">Base salary</span><span class="smc-val">${yen(x.base)}</span></div>
+      <div class="smc-row"><span class="smc-lbl">Salary after tax</span><span class="smc-val">${yen(x.base)}</span></div>
       ${x.bonus ? `<div class="smc-row"><span class="smc-lbl">Bonus</span><span class="smc-val pos">+${yen(x.bonus)}</span></div>` : ''}
-      ${x.tax ? `<div class="smc-row"><span class="smc-lbl">Tax / deductions</span><span class="smc-val neg">−${yen(x.tax)}</span></div>` : ''}
+      ${x.rent ? `<div class="smc-row"><span class="smc-lbl">🏠 Rent</span><span class="smc-val neg">−${yen(x.rent)}</span></div>` : ''}
+      ${x.car ? `<div class="smc-row"><span class="smc-lbl">🚗 Car loan</span><span class="smc-val neg">−${yen(x.car)}</span></div>` : ''}
+      ${x.wallets ? `<div class="smc-row"><span class="smc-lbl">👫 Our wallets</span><span class="smc-val neg">−${yen(x.wallets)}</span></div>` : ''}
+      ${x.cc ? `<div class="smc-row"><span class="smc-lbl">💳 Credit card</span><span class="smc-val neg">−${yen(x.cc)}</span></div>` : ''}
+      <div class="smc-savings-row">
+        <span class="smc-savings-lbl">Remaining / savings</span>
+        <span class="smc-val ${savCls}" style="font-size:15px">${saving >= 0 ? '+' : ''}${yen(saving)}</span>
+      </div>
     </div>`;
   });
   el.innerHTML = html;
