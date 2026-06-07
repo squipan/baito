@@ -1161,9 +1161,13 @@ function addSalary() {
   const year    = document.getElementById('sal-year').value;
   const base    = parseFloat(document.getElementById('sal-base').value) || 0;
   const bonus   = parseFloat(document.getElementById('sal-bonus').value) || 0;
-  const rent    = parseFloat(document.getElementById('sal-rent').value) || 0;
-  const car     = parseFloat(document.getElementById('sal-car').value) || 0;
-  const wallets = parseFloat(document.getElementById('sal-wallets').value) || 0;
+  const d       = getSalDefaults();
+  const rentRaw    = document.getElementById('sal-rent').value;
+  const carRaw     = document.getElementById('sal-car').value;
+  const walletsRaw = document.getElementById('sal-wallets').value;
+  const rent    = rentRaw    !== '' ? parseFloat(rentRaw)    : d.rent;
+  const car     = carRaw     !== '' ? parseFloat(carRaw)     : d.car;
+  const wallets = walletsRaw !== '' ? parseFloat(walletsRaw) : d.wallets;
   const cc      = parseFloat(document.getElementById('sal-cc').value) || 0;
   const note    = document.getElementById('sal-note').value.trim();
   if (!base) { toast('Enter salary'); return; }
@@ -1195,12 +1199,11 @@ function renderSalary() {
     <div><div class="syb-lbl">Total savings ${yr}</div><div class="syb-val">${yen(yearSavings)}</div></div>
     <i class="ti ti-briefcase" style="font-size:30px;opacity:0.5;color:var(--green-text)" aria-hidden="true"></i>
   </div>` : '';
-  // prefill defaults into form if empty
+  // show defaults as placeholders so user knows what will be used
   const d = getSalDefaults();
-  ['rent','car','wallets'].forEach(k => {
-    const el2 = document.getElementById('sal-' + (k === 'wallets' ? 'wallets' : k));
-    if (el2 && !el2.value) el2.placeholder = yen(d[k]).replace('¥','');
-  });
+  document.getElementById('sal-rent').placeholder    = d.rent.toLocaleString('ja-JP') + ' (default)';
+  document.getElementById('sal-car').placeholder     = d.car.toLocaleString('ja-JP') + ' (default)';
+  document.getElementById('sal-wallets').placeholder = d.wallets.toLocaleString('ja-JP') + ' (default)';
   if (!items.length) { el.innerHTML = '<div class="empty">No salary logged yet</div>'; return; }
   let html = '';
   items.forEach(x => {
