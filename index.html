@@ -31,7 +31,6 @@ const fbApp  = initializeApp(firebaseConfig);
 const auth   = getAuth(fbApp);
 const db     = getFirestore(fbApp);
 
-// Expose to global scope so non-module scripts can use them
 window._auth = auth;
 window._db   = db;
 window._GoogleAuthProvider = GoogleAuthProvider;
@@ -45,7 +44,6 @@ window._onSnapshot = onSnapshot;
 window._collection = collection;
 window._getDocs   = getDocs;
 
-// Keys we sync to Firestore
 const SYNC_KEYS = ['shifts','actuals','english','gas','salary','salDefaults','wallet'];
 
 window.fbSave = async function(key, value) {
@@ -69,14 +67,12 @@ window.fbLoadAll = async function() {
   } catch(e) { console.warn('Firebase load failed', e); }
 };
 
-// Auth state observer
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').style.display = '';
     document.getElementById('user-avatar').textContent = user.displayName ? user.displayName[0].toUpperCase() : '?';
     document.getElementById('user-name').textContent = user.displayName || user.email;
-    // Load data from Firebase then render
     await window.fbLoadAll();
     window._appReady();
   } else {
@@ -97,98 +93,17 @@ window.signOutUser = async function() {
 };
 </script>
 
-
 <script>
 const manifestData = {
-  name: "My Income Tracker",
-  short_name: "My Income",
-  description: "Track shifts, English lessons and gas",
-  start_url: "./",
-  display: "standalone",
-  background_color: "#ffffff",
-  theme_color: "#1D9E75",
+  name: "My Income Tracker", short_name: "My Income",
+  start_url: "./", display: "standalone",
+  background_color: "#0d1117", theme_color: "#1D9E75",
   icons: [
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%231D9E75'/><rect x='28' y='58' width='136' height='88' rx='12' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='2'/><rect x='28' y='80' width='136' height='3' fill='rgba(255,255,255,0.35)'/><circle cx='62' cy='103' r='13' fill='white' opacity='0.9'/><circle cx='86' cy='103' r='13' fill='white' opacity='0.5'/><rect x='104' y='95' width='44' height='8' rx='4' fill='rgba(255,255,255,0.45)'/><rect x='104' y='109' width='30' height='6' rx='3' fill='rgba(255,255,255,0.3)'/><text x='96' y='168' font-size='16' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='2'>収入</text></svg>", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231D9E75'/><rect x='74' y='152' width='364' height='234' rx='32' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='5'/><rect x='74' y='212' width='364' height='8' fill='rgba(255,255,255,0.35)'/><circle cx='166' cy='270' r='36' fill='white' opacity='0.9'/><circle cx='230' cy='270' r='36' fill='white' opacity='0.5'/><rect x='276' y='248' width='118' height='22' rx='11' fill='rgba(255,255,255,0.45)'/><rect x='276' y='280' width='80' height='16' rx='8' fill='rgba(255,255,255,0.3)'/><text x='256' y='448' font-size='44' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='4'>収入</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%231D9E75'/><text x='96' y='120' font-size='80' text-anchor='middle'>💴</text></svg>", sizes: "192x192", type: "image/svg+xml" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-const manifestURL = URL.createObjectURL(blob);
-document.write('<link rel="manifest" href="' + manifestURL + '">');
-</script>
-
-
-<script>
-(function(){
-  const c = document.createElement('canvas');
-  c.width = c.height = 180;
-  const ctx = c.getContext('2d');
-
-  // Background - rounded rect
-  const r = 38;
-  ctx.beginPath();
-  ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
-  ctx.quadraticCurveTo(180, 0, 180, r);
-  ctx.lineTo(180, 180-r);
-  ctx.quadraticCurveTo(180, 180, 180-r, 180);
-  ctx.lineTo(r, 180);
-  ctx.quadraticCurveTo(0, 180, 0, 180-r);
-  ctx.lineTo(0, r);
-  ctx.quadraticCurveTo(0, 0, r, 0);
-  ctx.closePath();
-  ctx.fillStyle = '#1D9E75';
-  ctx.fill();
-
-  // Card body
-  ctx.beginPath();
-  roundRect(ctx, 22, 52, 136, 84, 12);
-  ctx.fillStyle = 'rgba(255,255,255,0.18)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.38)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Card stripe
-  ctx.fillStyle = 'rgba(255,255,255,0.32)';
-  ctx.fillRect(22, 74, 136, 7);
-
-  // Chip circles
-  ctx.beginPath(); ctx.arc(56, 98, 13, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(78, 98, 13, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
-
-  // Lines on right
-  ctx.fillStyle = 'rgba(255,255,255,0.42)';
-  ctx.beginPath(); roundRect(ctx, 100, 90, 44, 8, 4); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.28)';
-  ctx.beginPath(); roundRect(ctx, 100, 104, 30, 6, 3); ctx.fill();
-
-  // Bottom text
-  ctx.font = '700 17px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.88)';
-  ctx.textAlign = 'center';
-  ctx.fillText('収入', 90, 158);
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
-    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-    ctx.lineTo(x+w, y+h-r);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    ctx.lineTo(x+r, y+h);
-    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-    ctx.lineTo(x, y+r);
-    ctx.quadraticCurveTo(x, y, x+r, y);
-    ctx.closePath();
-  }
-
-  const url = c.toDataURL('image/png');
-  const link = document.createElement('link');
-  link.rel = 'apple-touch-icon';
-  link.href = url;
-  document.head.appendChild(link);
-})();
+document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -196,8 +111,10 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
 <style>
+/* ─── LIGHT THEME ─────────────────────────────────────────── */
 :root {
   --bg: #f7f6f2;
+  --bg2: #eeede8;
   --card: #ffffff;
   --card2: #f0efe9;
   --text: #111111;
@@ -218,60 +135,192 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
   --purple-bg: #EEEDFE;
   --purple-text: #3C3489;
   --red: #c0392b;
+  --sidebar-w: 220px;
   --font: 'DM Sans', sans-serif;
   --mono: 'DM Mono', monospace;
   --r: 12px;
   --r-sm: 8px;
 }
-.dark {
-  --bg: #0e0e0e;
-  --card: #1a1a1a;
-  --card2: #222222;
-  --text: #eeeeee;
-  --text2: #888888;
-  --text3: #555555;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.15);
-  --green: #5DCAA5;
-  --green-bg: #04342C;
-  --green-text: #9FE1CB;
-  --amber: #EF9F27;
-  --amber-bg: #3a2000;
-  --amber-text: #FAC775;
-  --blue: #5aa3e8;
-  --blue-bg: #0a2a4a;
-  --blue-text: #B5D4F4;
-  --purple: #AFA9EC;
-  --purple-bg: #26215C;
-  --purple-text: #CECBF6;
-  --red: #e05c4b;
-}
 
-/* FIX 1: propagate dark bg to html/body so no white flash */
-html, body { height: 100%; overflow: hidden; background: var(--bg, #f7f6f2); }
-.dark ~ body, body:has(.dark) { background: #0e0e0e; }
+/* ─── DARK THEME — trading dashboard palette ──────────────── */
+.dark {
+  --bg: #0d1117;
+  --bg2: #111820;
+  --card: #161b27;
+  --card2: #1c2333;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #484f58;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --green: #00e5a0;
+  --green-bg: #0a2a1e;
+  --green-text: #00e5a0;
+  --amber: #f0a500;
+  --amber-bg: #1f1600;
+  --amber-text: #f0c040;
+  --blue: #58a6ff;
+  --blue-bg: #0d1f3c;
+  --blue-text: #79c0ff;
+  --purple: #bc8cff;
+  --purple-bg: #1a1040;
+  --purple-text: #d2a8ff;
+  --red: #f85149;
+}
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-body {
+html, body {
+  height: 100%; overflow: hidden;
+  background: var(--bg, #0d1117);
   font-family: var(--font);
-  background: var(--bg);
   color: var(--text);
   font-size: 14px;
   line-height: 1.4;
 }
 
-/* FIX 2: app covers full screen and inherits bg */
-.app {
-  display: flex; flex-direction: column; height: 100vh;
-  max-width: 430px; margin: 0 auto; position: relative;
+/* ══════════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════════ */
+#login-screen {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; height: 100vh;
+  background: var(--bg); padding: 32px; gap: 24px;
+}
+.login-icon {
+  width: 72px; height: 72px; background: var(--green);
+  border-radius: 20px; display: flex; align-items: center;
+  justify-content: center; font-size: 36px;
+}
+.login-title { font-size: 24px; font-weight: 500; letter-spacing: -0.3px; color: var(--text); text-align: center; }
+.login-sub { font-size: 13px; color: var(--text3); margin-top: 6px; text-align: center; }
+.login-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 0.5px solid var(--border2);
+  border-radius: 12px; padding: 14px 24px; font-size: 14px;
+  font-weight: 500; color: var(--text); cursor: pointer;
+  font-family: var(--font); width: 100%; max-width: 280px; justify-content: center;
+}
+.login-note { font-size: 11px; color: var(--text3); text-align: center; line-height: 1.6; }
+
+/* ══════════════════════════════════════════════
+   APP SHELL — MOBILE FIRST, DESKTOP ENHANCED
+══════════════════════════════════════════════ */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   background: var(--bg);
   color: var(--text);
 }
 
-.scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 90px; }
+/* ─── DESKTOP SIDEBAR ─────────────────────────────────────── */
+#sidebar {
+  display: none; /* hidden on mobile */
+  flex-direction: column;
+  width: var(--sidebar-w);
+  background: var(--card);
+  border-right: 0.5px solid var(--border2);
+  flex-shrink: 0;
+  height: 100vh;
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 200;
+  padding: 0 0 16px;
+  overflow-y: auto;
+}
+#sidebar::-webkit-scrollbar { display: none; }
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 8px;
+}
+.sidebar-logo-icon {
+  width: 32px; height: 32px; background: var(--green);
+  border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.sidebar-logo-text { font-size: 14px; font-weight: 500; color: var(--text); letter-spacing: -0.2px; }
+
+.sidebar-nav { flex: 1; padding: 4px 10px; }
+.snb {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; background: none; border: none;
+  padding: 9px 10px; border-radius: var(--r-sm);
+  color: var(--text2); font-family: var(--font);
+  font-size: 13px; font-weight: 400; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-align: left; margin-bottom: 2px;
+}
+.snb i { font-size: 18px; flex-shrink: 0; }
+.snb:hover { background: var(--card2); color: var(--text); }
+.snb.active { background: var(--green-bg); color: var(--green); font-weight: 500; }
+
+.sidebar-bottom {
+  padding: 10px 10px 0;
+  border-top: 0.5px solid var(--border);
+  margin: 8px 0 0;
+}
+.sidebar-user {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: var(--r-sm);
+}
+.s-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--green); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+}
+.s-name { font-size: 12px; color: var(--text2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.s-actions { display: flex; gap: 4px; align-items: center; }
+.s-btn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 16px; padding: 4px;
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+}
+.s-btn:hover { color: var(--text); background: var(--card2); }
+
+/* ─── DESKTOP MAIN AREA ───────────────────────────────────── */
+#main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── DESKTOP TOPBAR ──────────────────────────────────────── */
+#desktop-topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background: var(--card);
+  border-bottom: 0.5px solid var(--border2);
+  flex-shrink: 0;
+}
+.dt-title { font-size: 16px; font-weight: 500; color: var(--text); letter-spacing: -0.2px; }
+.dt-actions { display: flex; gap: 8px; align-items: center; }
+.tbtn {
+  background: var(--card2); border: 0.5px solid var(--border2);
+  border-radius: 99px; padding: 6px 13px; font-size: 12px;
+  color: var(--text2); cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 5px;
+}
+.tbtn:active { opacity: 0.7; }
+
+/* ─── SCROLL AREA ─────────────────────────────────────────── */
+.scroll-area {
+  flex: 1; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 14px 90px;
+  background: var(--bg);
+}
 .scroll-area::-webkit-scrollbar { display: none; }
 
+/* ─── MOBILE BOTTOM NAV ───────────────────────────────────── */
 .bnav {
   display: grid; grid-template-columns: repeat(6, 1fr);
   background: var(--card); border-top: 0.5px solid var(--border2);
@@ -287,25 +336,25 @@ body {
 .nb i { font-size: 22px; }
 .nb.active { color: var(--green); }
 
+/* ─── PAGES ───────────────────────────────────────────────── */
 .page { display: none; }
 .page.active { display: block; }
 
-.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-.pg-title { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; color: var(--text); }
-.tbtn {
-  background: var(--card2); border: 0.5px solid var(--border2);
-  border-radius: 99px; padding: 6px 13px; font-size: 12px;
-  color: var(--text2); cursor: pointer; font-family: var(--font);
-  display: flex; align-items: center; gap: 5px;
+/* ─── MOBILE TOPBAR (inside page) ────────────────────────── */
+.topbar {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 18px;
 }
-.tbtn:active { opacity: 0.7; }
+.pg-title { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; color: var(--text); }
 
+/* ─── CARDS ───────────────────────────────────────────────── */
 .card {
   background: var(--card); border: 0.5px solid var(--border);
   border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
 }
 .card2 { background: var(--card2); border-radius: var(--r); padding: 13px 15px; margin-bottom: 12px; }
 
+/* ─── HOME HERO ───────────────────────────────────────────── */
 .hero-date { font-size: 28px; font-weight: 300; letter-spacing: -0.5px; color: var(--text); }
 .hero-weekday { font-size: 13px; color: var(--text2); margin-top: 2px; margin-bottom: 14px; }
 .hero-divider { border: none; border-top: 0.5px solid var(--border); margin-bottom: 14px; }
@@ -316,11 +365,10 @@ body {
 .ic-val.g { color: var(--green); }
 .ic-val.b { color: var(--blue); }
 
+/* ─── FORM ELEMENTS ───────────────────────────────────────── */
 .card-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
 .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.f { }
 .f label { font-size: 10px; color: var(--text3); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
-/* FIX 3: inputs and selects fully themed */
 .f input, .f select {
   width: 100%; background: var(--bg); border: 0.5px solid var(--border2);
   border-radius: var(--r-sm); padding: 9px 11px; font-size: 13px;
@@ -329,8 +377,6 @@ body {
 }
 .f input:focus, .f select:focus { border-color: var(--green); }
 .f input[readonly] { color: var(--text2); background: var(--card2); }
-
-/* FIX 4: select option text in dark mode */
 .f select option { background: var(--card); color: var(--text); }
 
 .preview-pill {
@@ -340,6 +386,7 @@ body {
 .preview-pill.show { display: flex; }
 .pp-lbl { font-size: 10px; color: var(--amber-text); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
 .pp-val { font-size: 16px; font-weight: 500; color: var(--amber-text); font-family: var(--mono); }
+
 .btn-add {
   width: 100%; background: var(--green); color: #fff; border: none;
   border-radius: var(--r-sm); padding: 11px; font-size: 14px; font-weight: 500;
@@ -347,7 +394,9 @@ body {
   transition: opacity 0.15s;
 }
 .btn-add:active { opacity: 0.8; }
+.dark .btn-add { color: #0d1117; }
 
+/* ─── MONTH NAV ───────────────────────────────────────────── */
 .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .m-title { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; color: var(--text); }
 .arrows { display: flex; gap: 6px; }
@@ -360,6 +409,7 @@ body {
 .arr:hover { background: var(--card); }
 .arr:disabled { opacity: 0.3; cursor: default; }
 
+/* ─── STATS ───────────────────────────────────────────────── */
 .stat3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 12px; }
 .sc { background: var(--card2); border-radius: var(--r-sm); padding: 10px 11px; }
 .sc-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
@@ -367,12 +417,12 @@ body {
 .sc-val.g { color: var(--green); }
 .sc-val.a { color: var(--amber); }
 
+/* ─── ACTUAL SALARY ───────────────────────────────────────── */
 .actual-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .actual-big { font-size: 22px; font-weight: 500; color: var(--green); font-family: var(--mono); margin-bottom: 2px; }
 .actual-diff { font-size: 11px; margin-bottom: 10px; }
 .actual-pending { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
 .inp-row { display: flex; gap: 6px; }
-/* FIX 5: standalone inputs (not inside .f) also themed */
 .inp-row input {
   flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
   border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
@@ -384,10 +434,10 @@ body {
   border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500;
   cursor: pointer; font-family: var(--font);
 }
+.dark .inp-row button { color: #0d1117; }
 
+/* ─── TABLE ───────────────────────────────────────────────── */
 .sec-hd { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 8px; }
-
-/* FIX 6: table text fully uses theme vars */
 .shift-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .shift-tbl th { font-size: 10px; color: var(--text3); font-weight: 400; padding: 0 4px 7px; text-align: left; border-bottom: 0.5px solid var(--border2); letter-spacing: 0.03em; text-transform: uppercase; }
 .shift-tbl th.r { text-align: right; }
@@ -401,6 +451,7 @@ body {
 .del-btn:hover { color: var(--red); }
 .tot-row td { font-size: 11px; color: var(--text2); padding-top: 10px; border-top: 0.5px solid var(--border2) !important; border-bottom: none !important; font-family: var(--mono); }
 
+/* ─── LIST ENTRIES ────────────────────────────────────────── */
 .mgrp { font-size: 11px; font-weight: 500; color: var(--text2); padding: 8px 0 4px; border-bottom: 0.5px solid var(--border2); margin-bottom: 3px; }
 .entry { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
 .entry:last-of-type { border-bottom: none; }
@@ -409,16 +460,16 @@ body {
 .e-amt { font-size: 14px; font-weight: 500; font-family: var(--mono); color: var(--text); }
 .total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; border-top: 0.5px solid var(--border2); margin-top: 4px; }
 
+/* ─── GAS ─────────────────────────────────────────────────── */
 .gas-banner { background: var(--green-bg); border-radius: var(--r); padding: 13px 15px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
 .gb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
 .gb-val { font-size: 22px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
 
+/* ─── MISC ────────────────────────────────────────────────── */
 .dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
 .dot.done { background: var(--green); }
 .dot.up { background: var(--text3); }
-
 .empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px 0; line-height: 1.6; }
-
 .toast-wrap { text-align: center; min-height: 30px; margin-top: 6px; }
 .toast {
   background: var(--text); color: var(--card); padding: 6px 18px;
@@ -427,14 +478,18 @@ body {
 }
 .toast.show { opacity: 1; }
 
-/* Wallet */
+/* ─── WALLET ──────────────────────────────────────────────── */
 .wallet-grand {
   background: var(--green); border-radius: var(--r);
   padding: 18px 18px; margin-bottom: 14px;
 }
+.dark .wallet-grand { background: linear-gradient(135deg, #003d2a 0%, #004d35 100%); border: 0.5px solid var(--green); }
 .wg-lbl { font-size: 10px; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.dark .wg-lbl { color: var(--green); }
 .wg-val { font-size: 32px; font-weight: 500; color: #fff; font-family: var(--mono); letter-spacing: -1px; }
+.dark .wg-val { color: var(--green); }
 .wg-updated { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+.dark .wg-updated { color: var(--text3); }
 .wallet-accounts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
 .wacc {
   background: var(--card); border: 0.5px solid var(--border);
@@ -465,7 +520,6 @@ body {
 .wallet-edit-form.open { display: block; }
 .we-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
 .we-row { display: flex; gap: 6px; }
-/* FIX 7: wallet edit inputs themed */
 .we-row input {
   flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
   border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
@@ -477,8 +531,10 @@ body {
   border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500;
   cursor: pointer; font-family: var(--font);
 }
+.dark .we-row button { color: #0d1117; }
 .wallet-note { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0 2px; line-height: 1.6; }
-/* Salary */
+
+/* ─── SALARY ──────────────────────────────────────────────── */
 .salary-month-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
 .smc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .smc-month { font-size: 15px; font-weight: 500; color: var(--text); }
@@ -496,359 +552,472 @@ body {
 .syb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
 .syb-val { font-size: 24px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
 
+/* ══════════════════════════════════════════════
+   DESKTOP BREAKPOINT  (≥ 768px)
+══════════════════════════════════════════════ */
+@media (min-width: 768px) {
 
-/* FIX 8: ensure html/body bg tracks dark class on app */
-html { background: #f7f6f2; }
-html.dark-html { background: #0e0e0e; }
+  #app {
+    flex-direction: row;
+    max-width: none;
+    margin: 0;
+  }
+
+  #sidebar {
+    display: flex;
+    position: relative;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+
+  #main-area {
+    margin-left: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  #desktop-topbar {
+    display: flex;
+  }
+
+  .bnav {
+    display: none;
+  }
+
+  /* Hide mobile-only topbars inside pages */
+  .page .topbar {
+    display: none;
+  }
+
+  .scroll-area {
+    padding: 24px 28px 40px;
+    max-width: 860px;
+  }
+
+  /* Desktop content layout improvements */
+  .income-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat3 {
+    gap: 10px;
+  }
+
+  .frow {
+    gap: 12px;
+  }
+
+  /* Wider cards on desktop */
+  .card, .card2 {
+    border-radius: 14px;
+  }
+
+  .salary-month-card {
+    border-radius: 14px;
+  }
+
+  /* Desktop hero */
+  .hero-date {
+    font-size: 34px;
+  }
+
+  /* Shift table columns */
+  .shift-tbl th, .shift-tbl td {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root { --sidebar-w: 240px; }
+
+  .scroll-area {
+    max-width: 960px;
+  }
+
+  .income-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- Login Screen -->
-<div id="login-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--bg);padding:32px;gap:24px;">
-  <div style="width:72px;height:72px;background:var(--green);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;">💴</div>
-  <div style="text-align:center;">
-    <div style="font-size:24px;font-weight:500;letter-spacing:-0.3px;color:var(--text)">My Income</div>
-    <div style="font-size:13px;color:var(--text3);margin-top:6px;">Sign in to access your data</div>
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="login-screen" style="display:flex">
+  <div class="login-icon">💴</div>
+  <div>
+    <div class="login-title">My Income</div>
+    <div class="login-sub">Sign in to access your data</div>
   </div>
-  <button onclick="window.signInGoogle()" style="display:flex;align-items:center;gap:10px;background:var(--card);border:0.5px solid var(--border2);border-radius:12px;padding:14px 24px;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--font);width:100%;max-width:280px;justify-content:center;">
+  <button class="login-btn" onclick="window.signInGoogle()">
     <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
     Sign in with Google
   </button>
-  <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.6;">Your data is stored securely<br>in the cloud and syncs across devices.</div>
+  <div class="login-note">Your data is stored securely in the cloud<br>and syncs across devices.</div>
 </div>
 
-<div class="app" id="app" style="display:none">
-  <div class="scroll-area" id="scroll">
+<!-- ══════════════ APP ══════════════ -->
+<div id="app" style="display:none">
 
-    <!-- HOME -->
-    <div class="page active" id="page-home">
-      <div class="topbar">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div id="user-avatar" style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0"></div>
-          <div id="user-name" style="font-size:13px;color:var(--text2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <button class="tbtn" id="tbtn" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i> Dark</button>
-          <button class="tbtn" onclick="window.signOutUser()" style="padding:6px 10px"><i class="ti ti-logout" aria-hidden="true"></i></button>
+  <!-- SIDEBAR (desktop) -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">💴</div>
+      <div class="sidebar-logo-text">My Income</div>
+    </div>
+    <div class="sidebar-nav">
+      <button class="snb active" onclick="goPage('home')" data-page="home">
+        <i class="ti ti-home"></i> Home
+      </button>
+      <button class="snb" onclick="goPage('months')" data-page="months">
+        <i class="ti ti-calendar"></i> はま寿司
+      </button>
+      <button class="snb" onclick="goPage('english')" data-page="english">
+        <i class="ti ti-school"></i> English
+      </button>
+      <button class="snb" onclick="goPage('gas')" data-page="gas">
+        <i class="ti ti-gas-station"></i> Gasoline
+      </button>
+      <button class="snb" onclick="goPage('wallet')" data-page="wallet">
+        <i class="ti ti-wallet"></i> Wallet
+      </button>
+      <button class="snb" onclick="goPage('salary')" data-page="salary">
+        <i class="ti ti-briefcase"></i> Main Job
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="s-avatar" id="user-avatar-desk"></div>
+        <div class="s-name" id="user-name-desk"></div>
+        <div class="s-actions">
+          <button class="s-btn" id="theme-btn-desk" onclick="toggleTheme()" title="Toggle theme"><i class="ti ti-moon"></i></button>
+          <button class="s-btn" onclick="window.signOutUser()" title="Sign out"><i class="ti ti-logout"></i></button>
         </div>
       </div>
-      <div class="card">
-        <div class="hero-date" id="h-date"></div>
-        <div class="hero-weekday" id="h-weekday"></div>
-        <hr class="hero-divider">
-        <div class="income-grid" id="h-income"></div>
+    </div>
+  </nav>
+
+  <!-- MAIN AREA -->
+  <div id="main-area">
+
+    <!-- Desktop topbar -->
+    <div id="desktop-topbar">
+      <div class="dt-title" id="dt-page-title">Home</div>
+      <div class="dt-actions">
+        <button class="tbtn" id="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i> Dark</button>
+        <button class="tbtn" onclick="window.signOutUser()" style="padding:6px 10px"><i class="ti ti-logout"></i></button>
       </div>
-      <div class="card2">
-        <div class="card-label"><i class="ti ti-clock" aria-hidden="true"></i> Log a shift</div>
-        <div class="frow">
-          <div class="f"><label>Date</label><input type="date" id="ql-date" oninput="qlDate()"></div>
-          <div class="f"><label>Day</label><input id="ql-day" readonly placeholder="Auto"></div>
-        </div>
-        <div class="frow">
-          <div class="f"><label>Time in</label><input type="time" id="ql-in" value="21:00" oninput="qlCalc()"></div>
-          <div class="f"><label>Time out</label><input type="time" id="ql-out" value="00:00" oninput="qlCalc()"></div>
-        </div>
-        <div class="preview-pill" id="ql-prev">
-          <div><div class="pp-lbl">This shift</div><div class="pp-val" id="ql-pval">—</div></div>
-          <div><div class="pp-lbl">Hours</div><div class="pp-val" id="ql-phrs">—</div></div>
-        </div>
-        <div class="frow" style="margin-bottom:10px">
-          <div class="f"><label>Month</label>
-            <select id="ql-month">
-              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
-              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
-              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
-            </select>
-          </div>
-          <div class="f"><label>Status</label>
-            <select id="ql-done"><option value="1">Done ✓</option><option value="0">Upcoming</option></select>
-          </div>
-        </div>
-        <button class="btn-add" onclick="qlSubmit()"><i class="ti ti-plus" aria-hidden="true"></i> Add shift</button>
-      </div>
-      <div class="toast-wrap"><span class="toast" id="toast"></span></div>
     </div>
 
-    <!-- MONTHS -->
-    <div class="page" id="page-months">
-      <div class="topbar">
-        <div class="pg-title">はま寿司</div>
-        <button class="tbtn" id="tbtn2" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
-      </div>
-      <div class="month-nav">
-        <div class="m-title" id="m-title">—</div>
-        <div class="arrows">
-          <button class="arr" id="arr-p" onclick="chMonth(-1)">‹</button>
-          <button class="arr" id="arr-n" onclick="chMonth(1)">›</button>
-        </div>
-      </div>
-      <div class="stat3" id="m-stats"></div>
-      <div class="card" id="m-actual"></div>
-      <div class="sec-hd">Shifts</div>
-      <table class="shift-tbl">
-        <colgroup>
-          <col style="width:29%"><col style="width:28%">
-          <col style="width:15%"><col style="width:21%"><col style="width:7%">
-        </colgroup>
-        <thead><tr>
-          <th>Date</th><th>In → Out</th>
-          <th class="r">Hrs</th><th class="r">予想給料</th><th></th>
-        </tr></thead>
-        <tbody id="m-tbody"></tbody>
-      </table>
-    </div>
+    <!-- SCROLL AREA -->
+    <div class="scroll-area" id="scroll">
 
-    <!-- ENGLISH -->
-    <div class="page" id="page-english">
-      <div class="topbar">
-        <div class="pg-title">English</div>
-        <button class="tbtn" id="tbtn3" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
-      </div>
-      <div class="card2">
-        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Add payment</div>
-        <div class="frow">
-          <div class="f"><label>Month</label>
-            <select id="e-month">
-              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
-              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
-              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
-            </select>
+      <!-- ── HOME ── -->
+      <div class="page active" id="page-home">
+        <!-- mobile topbar -->
+        <div class="topbar">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div id="user-avatar" style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0"></div>
+            <div id="user-name" style="font-size:13px;color:var(--text2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
           </div>
-          <div class="f"><label>Amount (¥)</label><input type="number" id="e-amt" placeholder="19080"></div>
-        </div>
-        <div class="f" style="margin-bottom:10px">
-          <label>Note (optional)</label>
-          <input type="text" id="e-note" placeholder="e.g. enrollment fee">
-        </div>
-        <button class="btn-add" onclick="addEnglish()">Add payment</button>
-      </div>
-      <div id="english-list"></div>
-    </div>
-
-    <!-- GAS -->
-    <div class="page" id="page-gas">
-      <div class="topbar">
-        <div class="pg-title">Gasoline</div>
-        <button class="tbtn" id="tbtn4" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
-      </div>
-      <div id="gas-banner"></div>
-      <div class="card2">
-        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Log refuel</div>
-        <div class="frow">
-          <div class="f"><label>Date</label><input type="date" id="g-date"></div>
-          <div class="f"><label>Cost (¥)</label><input type="number" id="g-cost" placeholder="3500"></div>
-        </div>
-        <div class="frow" style="margin-bottom:10px">
-          <div class="f"><label>Odometer (km)</label><input type="number" id="g-odo" placeholder="12500"></div>
-          <div class="f"><label>Note</label><input type="text" id="g-note" placeholder="optional"></div>
-        </div>
-        <button class="btn-add" onclick="addGas()">Add refuel</button>
-      </div>
-      <div id="gas-list"></div>
-    </div>
-
-    <!-- WALLET -->
-    <div class="page" id="page-wallet">
-      <div class="topbar">
-        <div class="pg-title">Wallet</div>
-        <button class="tbtn" id="tbtn5" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
-      </div>
-
-      <div class="wallet-grand" id="w-grand">
-        <div class="wg-lbl">Grand total</div>
-        <div class="wg-val" id="w-grand-val">¥0</div>
-        <div class="wg-updated" id="w-grand-sub"></div>
-      </div>
-
-      <div class="wallet-accounts">
-
-        <!-- UFJ -->
-        <div>
-          <div class="wacc">
-            <div class="wacc-left">
-              <div class="wacc-icon ufj"><i class="ti ti-building-bank" aria-hidden="true"></i></div>
-              <div>
-                <div class="wacc-name">UFJ</div>
-                <div class="wacc-updated" id="w-ufj-date">—</div>
-              </div>
-            </div>
-            <div class="wacc-right">
-              <div class="wacc-amt ufj" id="w-ufj-val">—</div>
-              <button class="wacc-edit" onclick="toggleEdit('ufj')" aria-label="edit UFJ balance"><i class="ti ti-pencil" aria-hidden="true"></i></button>
-            </div>
-          </div>
-          <div class="wallet-edit-form" id="edit-ufj">
-            <div class="we-lbl">Current UFJ balance (¥)</div>
-            <div class="we-row">
-              <input type="number" id="inp-ufj" placeholder="e.g. 45000">
-              <button onclick="saveWallet('ufj')">Save</button>
-            </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="tbtn" id="tbtn-mob" onclick="toggleTheme()"><i class="ti ti-moon"></i> Dark</button>
+            <button class="tbtn" onclick="window.signOutUser()" style="padding:6px 10px"><i class="ti ti-logout"></i></button>
           </div>
         </div>
-
-        <!-- ゆうちょ -->
-        <div>
-          <div class="wacc">
-            <div class="wacc-left">
-              <div class="wacc-icon yucho"><i class="ti ti-coin" aria-hidden="true"></i></div>
-              <div>
-                <div class="wacc-name">ゆうちょ</div>
-                <div class="wacc-updated" id="w-yucho-date">—</div>
-              </div>
-            </div>
-            <div class="wacc-right">
-              <div class="wacc-amt yucho" id="w-yucho-val">—</div>
-              <button class="wacc-edit" onclick="toggleEdit('yucho')" aria-label="edit ゆうちょ balance"><i class="ti ti-pencil" aria-hidden="true"></i></button>
-            </div>
-          </div>
-          <div class="wallet-edit-form" id="edit-yucho">
-            <div class="we-lbl">Current ゆうちょ balance (¥)</div>
-            <div class="we-row">
-              <input type="number" id="inp-yucho" placeholder="e.g. 20000">
-              <button onclick="saveWallet('yucho')">Save</button>
-            </div>
-          </div>
+        <div class="card">
+          <div class="hero-date" id="h-date"></div>
+          <div class="hero-weekday" id="h-weekday"></div>
+          <hr class="hero-divider">
+          <div class="income-grid" id="h-income"></div>
         </div>
-
-        <!-- English lessons total -->
-        <div>
-          <div class="wacc">
-            <div class="wacc-left">
-              <div class="wacc-icon english"><i class="ti ti-school" aria-hidden="true"></i></div>
-              <div>
-                <div class="wacc-name">English lessons</div>
-                <div class="wacc-updated" id="w-english-date">All time total</div>
-              </div>
-            </div>
-            <div class="wacc-right">
-              <div class="wacc-amt english" id="w-english-val">¥0</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 現金 Cash -->
-        <div>
-          <div class="wacc">
-            <div class="wacc-left">
-              <div class="wacc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-cash" aria-hidden="true"></i></div>
-              <div>
-                <div class="wacc-name">現金 / Cash</div>
-                <div class="wacc-updated" id="w-cash-date">—</div>
-              </div>
-            </div>
-            <div class="wacc-right">
-              <div class="wacc-amt" style="color:var(--green)" id="w-cash-val">—</div>
-              <button class="wacc-edit" onclick="toggleEdit('cash')" aria-label="edit cash"><i class="ti ti-pencil" aria-hidden="true"></i></button>
-            </div>
-          </div>
-          <div class="wallet-edit-form" id="edit-cash">
-            <div class="we-lbl">Current cash on hand (¥)</div>
-            <div class="we-row">
-              <input type="number" id="inp-cash" placeholder="e.g. 15000">
-              <button onclick="saveWallet('cash')">Save</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
-    </div>
-
-
-    <!-- SALARY -->
-    <div class="page" id="page-salary">
-      <div class="topbar">
-        <div class="pg-title">Main Job</div>
-        <button class="tbtn" id="tbtn6" onclick="toggleTheme()"><i class="ti ti-moon" aria-hidden="true"></i></button>
-      </div>
-
-      <!-- Defaults card -->
-      <div class="card2" id="sal-defaults-card">
-        <div class="card-label" style="justify-content:space-between;cursor:pointer" onclick="toggleSalDefaults()">
-          <span><i class="ti ti-settings" aria-hidden="true"></i> Default deductions</span>
-          <i class="ti ti-chevron-down" id="sal-def-chevron" aria-hidden="true"></i>
-        </div>
-        <div id="sal-defaults-body" style="display:none">
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-clock"></i> Log a shift</div>
           <div class="frow">
-            <div class="f"><label>Rent (¥)</label><input type="number" id="def-rent" placeholder="84000" oninput="saveDefaults()"></div>
-            <div class="f"><label>Car loan (¥)</label><input type="number" id="def-car" placeholder="40480" oninput="saveDefaults()"></div>
+            <div class="f"><label>Date</label><input type="date" id="ql-date" oninput="qlDate()"></div>
+            <div class="f"><label>Day</label><input id="ql-day" readonly placeholder="Auto"></div>
           </div>
-          <div class="frow" style="margin-bottom:4px">
-            <div class="f"><label>Our wallets (¥)</label><input type="number" id="def-wallets" placeholder="70000" oninput="saveDefaults()"></div>
+          <div class="frow">
+            <div class="f"><label>Time in</label><input type="time" id="ql-in" value="21:00" oninput="qlCalc()"></div>
+            <div class="f"><label>Time out</label><input type="time" id="ql-out" value="00:00" oninput="qlCalc()"></div>
+          </div>
+          <div class="preview-pill" id="ql-prev">
+            <div><div class="pp-lbl">This shift</div><div class="pp-val" id="ql-pval">—</div></div>
+            <div><div class="pp-lbl">Hours</div><div class="pp-val" id="ql-phrs">—</div></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="f"><label>Month</label>
+              <select id="ql-month">
+                <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+                <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+                <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+              </select>
+            </div>
+            <div class="f"><label>Status</label>
+              <select id="ql-done"><option value="1">Done ✓</option><option value="0">Upcoming</option></select>
+            </div>
+          </div>
+          <button class="btn-add" onclick="qlSubmit()"><i class="ti ti-plus"></i> Add shift</button>
+        </div>
+        <div class="toast-wrap"><span class="toast" id="toast"></span></div>
+      </div>
+
+      <!-- ── MONTHS ── -->
+      <div class="page" id="page-months">
+        <div class="topbar">
+          <div class="pg-title">はま寿司</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="month-nav">
+          <div class="m-title" id="m-title">—</div>
+          <div class="arrows">
+            <button class="arr" id="arr-p" onclick="chMonth(-1)">‹</button>
+            <button class="arr" id="arr-n" onclick="chMonth(1)">›</button>
+          </div>
+        </div>
+        <div class="stat3" id="m-stats"></div>
+        <div class="card" id="m-actual"></div>
+        <div class="sec-hd">Shifts</div>
+        <table class="shift-tbl">
+          <colgroup>
+            <col style="width:29%"><col style="width:28%">
+            <col style="width:15%"><col style="width:21%"><col style="width:7%">
+          </colgroup>
+          <thead><tr>
+            <th>Date</th><th>In → Out</th>
+            <th class="r">Hrs</th><th class="r">予想給料</th><th></th>
+          </tr></thead>
+          <tbody id="m-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- ── ENGLISH ── -->
+      <div class="page" id="page-english">
+        <div class="topbar">
+          <div class="pg-title">English</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-plus"></i> Add payment</div>
+          <div class="frow">
+            <div class="f"><label>Month</label>
+              <select id="e-month">
+                <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+                <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+                <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+              </select>
+            </div>
+            <div class="f"><label>Amount (¥)</label><input type="number" id="e-amt" placeholder="19080"></div>
+          </div>
+          <div class="f" style="margin-bottom:10px">
+            <label>Note (optional)</label>
+            <input type="text" id="e-note" placeholder="e.g. enrollment fee">
+          </div>
+          <button class="btn-add" onclick="addEnglish()">Add payment</button>
+        </div>
+        <div id="english-list"></div>
+      </div>
+
+      <!-- ── GAS ── -->
+      <div class="page" id="page-gas">
+        <div class="topbar">
+          <div class="pg-title">Gasoline</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div id="gas-banner"></div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-plus"></i> Log refuel</div>
+          <div class="frow">
+            <div class="f"><label>Date</label><input type="date" id="g-date"></div>
+            <div class="f"><label>Cost (¥)</label><input type="number" id="g-cost" placeholder="3500"></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="f"><label>Odometer (km)</label><input type="number" id="g-odo" placeholder="12500"></div>
+            <div class="f"><label>Note</label><input type="text" id="g-note" placeholder="optional"></div>
+          </div>
+          <button class="btn-add" onclick="addGas()">Add refuel</button>
+        </div>
+        <div id="gas-list"></div>
+      </div>
+
+      <!-- ── WALLET ── -->
+      <div class="page" id="page-wallet">
+        <div class="topbar">
+          <div class="pg-title">Wallet</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="wallet-grand" id="w-grand">
+          <div class="wg-lbl">Grand total</div>
+          <div class="wg-val" id="w-grand-val">¥0</div>
+          <div class="wg-updated" id="w-grand-sub"></div>
+        </div>
+        <div class="wallet-accounts">
+          <!-- UFJ -->
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon ufj"><i class="ti ti-building-bank"></i></div>
+                <div>
+                  <div class="wacc-name">UFJ</div>
+                  <div class="wacc-updated" id="w-ufj-date">—</div>
+                </div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt ufj" id="w-ufj-val">—</div>
+                <button class="wacc-edit" onclick="toggleEdit('ufj')"><i class="ti ti-pencil"></i></button>
+              </div>
+            </div>
+            <div class="wallet-edit-form" id="edit-ufj">
+              <div class="we-lbl">Current UFJ balance (¥)</div>
+              <div class="we-row">
+                <input type="number" id="inp-ufj" placeholder="e.g. 45000">
+                <button onclick="saveWallet('ufj')">Save</button>
+              </div>
+            </div>
+          </div>
+          <!-- ゆうちょ -->
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon yucho"><i class="ti ti-coin"></i></div>
+                <div>
+                  <div class="wacc-name">ゆうちょ</div>
+                  <div class="wacc-updated" id="w-yucho-date">—</div>
+                </div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt yucho" id="w-yucho-val">—</div>
+                <button class="wacc-edit" onclick="toggleEdit('yucho')"><i class="ti ti-pencil"></i></button>
+              </div>
+            </div>
+            <div class="wallet-edit-form" id="edit-yucho">
+              <div class="we-lbl">Current ゆうちょ balance (¥)</div>
+              <div class="we-row">
+                <input type="number" id="inp-yucho" placeholder="e.g. 20000">
+                <button onclick="saveWallet('yucho')">Save</button>
+              </div>
+            </div>
+          </div>
+          <!-- English total -->
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon english"><i class="ti ti-school"></i></div>
+                <div>
+                  <div class="wacc-name">English lessons</div>
+                  <div class="wacc-updated" id="w-english-date">All time total</div>
+                </div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt english" id="w-english-val">¥0</div>
+              </div>
+            </div>
+          </div>
+          <!-- Cash -->
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-cash"></i></div>
+                <div>
+                  <div class="wacc-name">現金 / Cash</div>
+                  <div class="wacc-updated" id="w-cash-date">—</div>
+                </div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt" style="color:var(--green)" id="w-cash-val">—</div>
+                <button class="wacc-edit" onclick="toggleEdit('cash')"><i class="ti ti-pencil"></i></button>
+              </div>
+            </div>
+            <div class="wallet-edit-form" id="edit-cash">
+              <div class="we-lbl">Current cash on hand (¥)</div>
+              <div class="we-row">
+                <input type="number" id="inp-cash" placeholder="e.g. 15000">
+                <button onclick="saveWallet('cash')">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
+      </div>
+
+      <!-- ── SALARY ── -->
+      <div class="page" id="page-salary">
+        <div class="topbar">
+          <div class="pg-title">Main Job</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="card2" id="sal-defaults-card">
+          <div class="card-label" style="justify-content:space-between;cursor:pointer" onclick="toggleSalDefaults()">
+            <span><i class="ti ti-settings"></i> Default deductions</span>
+            <i class="ti ti-chevron-down" id="sal-def-chevron"></i>
+          </div>
+          <div id="sal-defaults-body" style="display:none">
+            <div class="frow">
+              <div class="f"><label>Rent (¥)</label><input type="number" id="def-rent" placeholder="84000" oninput="saveDefaults()"></div>
+              <div class="f"><label>Car loan (¥)</label><input type="number" id="def-car" placeholder="40480" oninput="saveDefaults()"></div>
+            </div>
+            <div class="frow" style="margin-bottom:4px">
+              <div class="f"><label>Our wallets (¥)</label><input type="number" id="def-wallets" placeholder="70000" oninput="saveDefaults()"></div>
+              <div class="f"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:4px">Changes apply to new entries only</div>
+          </div>
+        </div>
+        <div id="salary-year-banner"></div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-plus"></i> Log this month</div>
+          <div class="frow">
+            <div class="f"><label>Month</label>
+              <select id="sal-month">
+                <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+                <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+                <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+              </select>
+            </div>
+            <div class="f"><label>Year</label><select id="sal-year"></select></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Salary after tax (¥)</label><input type="number" id="sal-base"></div>
+            <div class="f"><label>Bonus (¥)</label><input type="number" id="sal-bonus" placeholder="0"></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Rent (¥)</label><input type="number" id="sal-rent" placeholder="84000"></div>
+            <div class="f"><label>Car loan (¥)</label><input type="number" id="sal-car" placeholder="40480"></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Our wallets (¥)</label><input type="number" id="sal-wallets" placeholder="70000"></div>
+            <div class="f"><label>Credit card (¥)</label><input type="number" id="sal-cc" placeholder="0"></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="f"><label>Note</label><input type="text" id="sal-note" placeholder="optional"></div>
             <div class="f"></div>
           </div>
-          <div style="font-size:10px;color:var(--text3);margin-top:4px">Changes apply to new entries only</div>
+          <button class="btn-add" onclick="addSalary()"><i class="ti ti-plus"></i> Save month</button>
         </div>
+        <div id="salary-list"></div>
       </div>
 
-      <div id="salary-year-banner"></div>
+    </div><!-- /scroll-area -->
+  </div><!-- /main-area -->
 
-      <div class="card2">
-        <div class="card-label"><i class="ti ti-plus" aria-hidden="true"></i> Log this month</div>
-        <div class="frow">
-          <div class="f"><label>Month</label>
-            <select id="sal-month">
-              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
-              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
-              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
-            </select>
-          </div>
-          <div class="f"><label>Year</label>
-            <select id="sal-year"></select>
-          </div>
-        </div>
-        <div class="frow">
-          <div class="f"><label>Salary after tax (¥)</label><input type="number" id="sal-base"></div>
-          <div class="f"><label>Bonus (¥)</label><input type="number" id="sal-bonus" placeholder="0"></div>
-        </div>
-        <div class="frow">
-          <div class="f"><label>Rent (¥)</label><input type="number" id="sal-rent" placeholder="84000"></div>
-          <div class="f"><label>Car loan (¥)</label><input type="number" id="sal-car" placeholder="40480"></div>
-        </div>
-        <div class="frow">
-          <div class="f"><label>Our wallets (¥)</label><input type="number" id="sal-wallets" placeholder="70000"></div>
-          <div class="f"><label>Credit card (¥)</label><input type="number" id="sal-cc" placeholder="0"></div>
-        </div>
-        <div class="frow" style="margin-bottom:10px">
-          <div class="f"><label>Note</label><input type="text" id="sal-note" placeholder="optional"></div>
-          <div class="f"></div>
-        </div>
-        <button class="btn-add" onclick="addSalary()"><i class="ti ti-plus" aria-hidden="true"></i> Save month</button>
-      </div>
-      <div id="salary-list"></div>
-    </div>
-
-  </div>
-
-  <!-- Bottom Nav -->
+  <!-- MOBILE BOTTOM NAV -->
   <div class="bnav">
-    <button class="nb active" onclick="goPage('home')" aria-label="Home">
-      <i class="ti ti-home" aria-hidden="true"></i><span>Home</span>
-    </button>
-    <button class="nb" onclick="goPage('months')" aria-label="Shifts">
-      <i class="ti ti-calendar" aria-hidden="true"></i><span>Shifts</span>
-    </button>
-    <button class="nb" onclick="goPage('english')" aria-label="English">
-      <i class="ti ti-school" aria-hidden="true"></i><span>English</span>
-    </button>
-    <button class="nb" onclick="goPage('gas')" aria-label="Gas">
-      <i class="ti ti-gas-station" aria-hidden="true"></i><span>Gas</span>
-    </button>
-    <button class="nb" onclick="goPage('wallet')" aria-label="Wallet">
-      <i class="ti ti-wallet" aria-hidden="true"></i><span>Wallet</span>
-    </button>
-    <button class="nb" onclick="goPage('salary')" aria-label="Salary">
-      <i class="ti ti-briefcase" aria-hidden="true"></i><span>Job</span>
-    </button>
+    <button class="nb active" onclick="goPage('home')"><i class="ti ti-home"></i><span>Home</span></button>
+    <button class="nb" onclick="goPage('months')"><i class="ti ti-calendar"></i><span>Shifts</span></button>
+    <button class="nb" onclick="goPage('english')"><i class="ti ti-school"></i><span>English</span></button>
+    <button class="nb" onclick="goPage('gas')"><i class="ti ti-gas-station"></i><span>Gas</span></button>
+    <button class="nb" onclick="goPage('wallet')"><i class="ti ti-wallet"></i><span>Wallet</span></button>
+    <button class="nb" onclick="goPage('salary')"><i class="ti ti-briefcase"></i><span>Job</span></button>
   </div>
-</div>
+
+</div><!-- /app -->
 
 <script>
 if ('serviceWorker' in navigator) {
   const swCode = `
-    const CACHE = 'income-v1';
+    const CACHE = 'income-v2';
     self.addEventListener('install', e => {
       e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])));
       self.skipWaiting();
@@ -865,10 +1034,12 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
 }
 
-const DAYS = ['日','月','火','水','木','金','土'];
-const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-const DAY_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const MON_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS    = ['日','月','火','水','木','金','土'];
+const MONTHS  = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const DAY_EN  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON_EN  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const PAGE_TITLES = { home:'Home', months:'はま寿司', english:'English', gas:'Gasoline', wallet:'Wallet', salary:'Main Job' };
+
 let dark = false, curMonth = 0;
 
 function gd(k) {
@@ -916,32 +1087,53 @@ function toast(msg) {
 
 function applyTheme() {
   const app = document.getElementById('app');
+  const login = document.getElementById('login-screen');
   app.classList.toggle('dark', dark);
-  // FIX: also update html/body background so no white shows outside the app div
-  document.documentElement.style.background = dark ? '#0e0e0e' : '#f7f6f2';
-  document.body.style.background = dark ? '#0e0e0e' : '#f7f6f2';
+  login.classList.toggle('dark', dark);
+  document.documentElement.style.background = dark ? '#0d1117' : '#f7f6f2';
+  document.body.style.background = dark ? '#0d1117' : '#f7f6f2';
+}
+
+function setThemeButtons() {
+  const icon  = dark ? 'ti-sun' : 'ti-moon';
+  const label = dark ? 'Light' : 'Dark';
+  // desktop topbar
+  const tb = document.getElementById('tbtn');
+  if (tb) tb.innerHTML = `<i class="ti ${icon}"></i> ${label}`;
+  // desktop sidebar
+  const tbd = document.getElementById('theme-btn-desk');
+  if (tbd) tbd.innerHTML = `<i class="ti ${icon}"></i>`;
+  // mobile topbar
+  const tbm = document.getElementById('tbtn-mob');
+  if (tbm) tbm.innerHTML = `<i class="ti ${icon}"></i> ${label}`;
+  // page-level theme buttons (inside .topbar on mobile)
+  document.querySelectorAll('.page .topbar .tbtn').forEach(el => {
+    el.innerHTML = `<i class="ti ${icon}"></i>`;
+  });
 }
 
 function toggleTheme() {
   dark = !dark;
   applyTheme();
-  const icon = dark ? 'ti-sun' : 'ti-moon';
-  const label = dark ? 'Light' : 'Dark';
-  document.getElementById('tbtn').innerHTML = `<i class="ti ${icon}" aria-hidden="true"></i> ${label}`;
-  ['tbtn2','tbtn3','tbtn4','tbtn5','tbtn6'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = `<i class="ti ${icon}" aria-hidden="true"></i>`;
-  });
+  setThemeButtons();
   localStorage.setItem('theme', dark ? 'dark' : 'light');
 }
 
 function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.snb').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
+  // mobile bottom nav
   ['home','months','english','gas','wallet','salary'].forEach((n,i) => {
     if (n === name) document.querySelectorAll('.nb')[i].classList.add('active');
   });
+  // desktop sidebar
+  const snb = document.querySelector(`.snb[data-page="${name}"]`);
+  if (snb) snb.classList.add('active');
+  // desktop topbar title
+  const dtt = document.getElementById('dt-page-title');
+  if (dtt) dtt.textContent = PAGE_TITLES[name] || name;
   document.getElementById('scroll').scrollTop = 0;
   if (name === 'home') renderHome();
   else if (name === 'months') renderMonths();
@@ -951,6 +1143,7 @@ function goPage(name) {
   else renderWallet();
 }
 
+/* ── HOME ── */
 function renderHome() {
   const now = new Date();
   document.getElementById('h-date').textContent = `${MON_EN[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
@@ -1011,6 +1204,7 @@ function qlSubmit() {
   renderHome();
 }
 
+/* ── MONTHS ── */
 function getMonths() { const seen = new Set(gd('shifts').map(s => s.month)); return MONTHS.filter(m => seen.has(m)); }
 function chMonth(d) { const ms = getMonths(); curMonth = Math.max(0, Math.min(ms.length-1, curMonth+d)); renderMonths(); }
 function renderMonths() {
@@ -1062,7 +1256,7 @@ function renderMonths() {
         <td>${s.tin}→${s.tout}</td>
         <td class="r">${mins ? fmtH(mins) : '—'}</td>
         <td class="r" style="color:${s.done ? 'var(--green)' : 'var(--amber)'}">${pay ? yen(pay) : '—'}</td>
-        <td><button class="del-btn" onclick="delShift(${s.id})" aria-label="delete">×</button></td>
+        <td><button class="del-btn" onclick="delShift(${s.id})">×</button></td>
       </tr>`;
     });
     rows += `<tr class="tot-row">
@@ -1085,6 +1279,7 @@ function delShift(id) {
   renderMonths(); renderHome();
 }
 
+/* ── ENGLISH ── */
 function renderEnglish() {
   const items = (gd('english') || []).sort((a,b) => (a.year+a.month).localeCompare(b.year+b.month));
   const el = document.getElementById('english-list');
@@ -1098,7 +1293,7 @@ function renderEnglish() {
       <div><div class="e-main">${i.note || i.month}</div></div>
       <div style="display:flex;align-items:center;gap:6px">
         <div class="e-amt" style="color:var(--blue)">${yen(i.amount)}</div>
-        <button class="del-btn" onclick="delEnglish(${i.id})" aria-label="delete">×</button>
+        <button class="del-btn" onclick="delEnglish(${i.id})">×</button>
       </div>
     </div>`;
   });
@@ -1125,6 +1320,7 @@ function delEnglish(id) {
   renderEnglish(); renderHome();
 }
 
+/* ── GAS ── */
 function renderGas() {
   const items = (gd('gas') || []).sort((a,b) => a.date.localeCompare(b.date));
   const el = document.getElementById('gas-list');
@@ -1143,7 +1339,7 @@ function renderGas() {
   banner.innerHTML = avg
     ? `<div class="gas-banner">
         <div><div class="gb-lbl">Avg km per refuel · ${items.length} fill-ups</div><div class="gb-val">${avg} km</div></div>
-        <i class="ti ti-gas-station" style="font-size:32px;opacity:0.5;color:var(--green-text)" aria-hidden="true"></i>
+        <i class="ti ti-gas-station" style="font-size:32px;opacity:0.5;color:var(--green-text)"></i>
        </div>` : '';
   let html = '';
   [...items].reverse().forEach(g => {
@@ -1156,7 +1352,7 @@ function renderGas() {
       </div>
       <div style="display:flex;align-items:center;gap:6px">
         <div class="e-amt">${yen(g.cost)}</div>
-        <button class="del-btn" onclick="delGas(${g.id})" aria-label="delete">×</button>
+        <button class="del-btn" onclick="delGas(${g.id})">×</button>
       </div>
     </div>`;
   });
@@ -1165,7 +1361,7 @@ function renderGas() {
 function addGas() {
   const date = document.getElementById('g-date').value;
   const cost = parseFloat(document.getElementById('g-cost').value);
-  const odo = parseFloat(document.getElementById('g-odo').value);
+  const odo  = parseFloat(document.getElementById('g-odo').value);
   const note = document.getElementById('g-note').value.trim();
   if (!date || isNaN(cost) || isNaN(odo)) { toast('Fill date, cost & odometer'); return; }
   const items = gd('gas') || [];
@@ -1178,6 +1374,7 @@ function addGas() {
 }
 function delGas(id) { sd('gas', (gd('gas') || []).filter(x => x.id !== id)); renderGas(); }
 
+/* ── WALLET ── */
 function fmtDate(ts) {
   if (!ts) return 'Not set yet';
   const d = new Date(ts);
@@ -1206,7 +1403,7 @@ function saveWallet(key) {
   renderWallet();
 }
 function renderWallet() {
-  const wallet = gd('wallet') || {};
+  const wallet  = gd('wallet') || {};
   const english = gd('english') || [];
   const engTotal = english.reduce((s, x) => s + (x.amount || 0), 0);
   const ufj   = wallet['ufj'];
@@ -1233,8 +1430,7 @@ function renderWallet() {
     : 'All accounts included';
 }
 
-
-// Salary defaults helpers
+/* ── SALARY ── */
 function getSalDefaults() {
   const d = gd('salDefaults') || {};
   return {
@@ -1296,7 +1492,6 @@ function delSalary(id) {
   renderSalary();
 }
 function renderSalary() {
-  // Populate year selector: current year ±3, always growing
   const yrSel = document.getElementById('sal-year');
   if (yrSel) {
     const curYr = new Date().getFullYear();
@@ -1315,15 +1510,14 @@ function renderSalary() {
   const el = document.getElementById('salary-list');
   const yr = new Date().getFullYear().toString();
   const yearSavings = items.filter(x => x.year === yr).reduce((s, x) => {
-    const total = x.base + (x.bonus||0);
+    const total  = x.base + (x.bonus||0);
     const deduct = (x.rent||0) + (x.car||0) + (x.wallets||0) + (x.cc||0);
     return s + (total - deduct);
   }, 0);
   banner.innerHTML = items.length ? `<div class="salary-year-banner">
     <div><div class="syb-lbl">Total savings ${yr}</div><div class="syb-val">${yen(yearSavings)}</div></div>
-    <i class="ti ti-briefcase" style="font-size:30px;opacity:0.5;color:var(--green-text)" aria-hidden="true"></i>
+    <i class="ti ti-briefcase" style="font-size:30px;opacity:0.5;color:var(--green-text)"></i>
   </div>` : '';
-  // show defaults as placeholders so user knows what will be used
   const d = getSalDefaults();
   document.getElementById('sal-rent').placeholder    = d.rent.toLocaleString('ja-JP') + ' (default)';
   document.getElementById('sal-car').placeholder     = d.car.toLocaleString('ja-JP') + ' (default)';
@@ -1340,7 +1534,7 @@ function renderSalary() {
         <div class="smc-month">${x.year} · ${x.month}${x.note ? ' <span style="font-size:11px;color:var(--text3)">— '+x.note+'</span>' : ''}</div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="smc-total ${savCls}">${saving >= 0 ? '+' : ''}${yen(saving)}</div>
-          <button class="del-btn" onclick="delSalary(${x.id})" aria-label="delete">×</button>
+          <button class="del-btn" onclick="delSalary(${x.id})">×</button>
         </div>
       </div>
       <div class="smc-row"><span class="smc-lbl">Salary after tax</span><span class="smc-val">${yen(x.base)}</span></div>
@@ -1358,82 +1552,22 @@ function renderSalary() {
   el.innerHTML = html;
 }
 
-function seed() {
-  if ((gd('shifts') || []).length) return;
-  const raw = [
-    ['1月','2026-01-01','木',true,'20:00','22:10'],['1月','2026-01-04','日',true,'21:00','00:10'],
-    ['1月','2026-01-06','火',true,'21:00','00:05'],['1月','2026-01-08','木',true,'21:00','00:00'],
-    ['1月','2026-01-11','日',true,'21:00','01:05'],['1月','2026-01-13','火',true,'21:00','23:46'],
-    ['1月','2026-01-15','木',true,'21:00','00:00'],['1月','2026-01-18','日',true,'21:00','00:08'],
-    ['1月','2026-01-20','火',true,'21:00','00:07'],['1月','2026-01-22','木',true,'21:00','00:05'],
-    ['1月','2026-01-25','日',true,'21:00','00:01'],['1月','2026-01-27','火',true,'21:00','00:06'],
-    ['1月','2026-01-29','木',true,'21:00','00:10'],
-    ['2月','2026-02-01','日',true,'21:00','01:15'],['2月','2026-02-03','火',true,'21:00','00:08'],
-    ['2月','2026-02-05','木',true,'21:00','01:02'],['2月','2026-02-08','日',true,'21:00','01:05'],
-    ['2月','2026-02-10','火',true,'21:00','01:16'],['2月','2026-02-12','木',true,'21:00','01:05'],
-    ['2月','2026-02-15','日',true,'21:00','23:46'],['2月','2026-02-17','火',true,'21:00','00:05'],
-    ['2月','2026-02-19','木',true,'21:00','00:02'],['2月','2026-02-22','日',true,'21:00','01:15'],
-    ['2月','2026-02-24','火',true,'21:00','00:04'],['2月','2026-02-26','木',true,'21:00','01:05'],
-    ['3月','2026-03-01','日',true,'21:00','00:35'],['3月','2026-03-03','火',true,'21:00','00:00'],
-    ['3月','2026-03-05','木',true,'21:00','00:00'],['3月','2026-03-08','日',true,'21:00','00:00'],
-    ['3月','2026-03-10','火',true,'21:00','00:00'],['3月','2026-03-12','木',true,'21:00','00:00'],
-    ['3月','2026-03-15','日',true,'21:00','01:19'],['3月','2026-03-17','火',true,'21:00','00:05'],
-    ['3月','2026-03-19','木',true,'21:00','00:08'],['3月','2026-03-22','日',true,'21:00','01:04'],
-    ['3月','2026-03-24','火',true,'21:00','00:03'],['3月','2026-03-26','木',true,'21:00','00:06'],
-    ['3月','2026-03-29','日',true,'21:00','01:20'],['3月','2026-03-31','火',true,'21:00','01:04'],
-    ['4月','2026-04-02','木',true,'21:00','01:05'],['4月','2026-04-05','日',true,'21:00','01:02'],
-    ['4月','2026-04-07','火',true,'21:00','00:05'],['4月','2026-04-09','木',true,'21:00','00:04'],
-    ['4月','2026-04-12','日',true,'21:00','00:03'],['4月','2026-04-14','火',true,'21:00','00:05'],
-    ['4月','2026-04-16','木',true,'21:00','00:00'],['4月','2026-04-19','日',true,'21:00','23:55'],
-    ['4月','2026-04-21','火',true,'21:00','00:06'],['4月','2026-04-23','木',true,'21:00','23:46'],
-    ['4月','2026-04-26','日',true,'21:00','00:10'],['4月','2026-04-28','火',true,'21:00','01:06'],
-    ['4月','2026-04-30','木',true,'21:00','00:03'],
-    ['5月','2026-05-03','日',true,'21:00','00:10'],['5月','2026-05-05','火',true,'21:00','00:07'],
-    ['5月','2026-05-07','木',true,'21:00','00:08'],['5月','2026-05-10','日',true,'21:00','01:00'],
-    ['5月','2026-05-12','火',true,'21:00','00:02'],['5月','2026-05-14','木',true,'21:00','00:02'],
-    ['5月','2026-05-17','日',true,'21:00','01:04'],['5月','2026-05-19','火',true,'21:00','23:55'],
-    ['5月','2026-05-21','木',true,'21:00','01:05'],['5月','2026-05-24','日',true,'21:00','01:03'],
-    ['5月','2026-05-26','火',true,'21:00','23:55'],['5月','2026-05-28','木',true,'21:00','00:05'],
-    ['5月','2026-05-31','日',true,'21:00','00:51'],
-    ['6月','2026-06-02','火',false,'21:00','00:00'],['6月','2026-06-04','木',false,'21:00','00:00'],
-    ['6月','2026-06-07','日',false,'21:00','00:00'],['6月','2026-06-09','火',false,'21:00','00:00'],
-    ['6月','2026-06-11','木',false,'21:00','00:00'],['6月','2026-06-14','日',false,'21:00','00:00'],
-    ['6月','2026-06-16','火',false,'21:00','00:00'],['6月','2026-06-18','木',false,'21:00','00:00'],
-    ['6月','2026-06-21','日',false,'21:00','00:00'],['6月','2026-06-23','火',false,'21:00','00:00'],
-    ['6月','2026-06-25','木',false,'21:00','00:00'],['6月','2026-06-28','日',false,'21:00','00:00'],
-    ['6月','2026-06-30','火',false,'21:00','00:00'],
-  ];
-  sd('shifts', raw.map((r,i) => ({ id: i+1, month: r[0], date: r[1], day: r[2], done: r[3], tin: r[4], tout: r[5] })));
-  sd('actuals', { '2026-1月': 60783, '2026-2月': 66198, '2026-3月': 67316, '2026-4月': 62629 });
-  sd('english', [
-    { id:1, year:'2026', month:'1月', amount:19080, note:'' },
-    { id:2, year:'2026', month:'1月', amount:83400, note:'Enrollment fee' },
-    { id:3, year:'2026', month:'2月', amount:19080, note:'' },
-    { id:4, year:'2026', month:'3月', amount:19080, note:'' },
-    { id:5, year:'2026', month:'4月', amount:25080, note:'' },
-    { id:6, year:'2026', month:'5月', amount:1080, note:'' },
-  ]);
-  sd('gas', [
-    { id:1, date:'2026-01-12', cost:3666, odo:10427, note:'' },
-    { id:2, date:'2026-01-27', cost:1806, odo:10608, note:'' },
-    { id:3, date:'2026-03-17', cost:1000, odo:11163, note:'' },
-    { id:4, date:'2026-03-23', cost:4095, odo:11258, note:'' },
-    { id:5, date:'2026-04-26', cost:4071, odo:11881, note:'' },
-  ]);
-}
-
-// Init — called after Firebase loads user data
+/* ── INIT ── */
 window._appReady = function() {
+  // Sync desktop user display
+  const av = document.getElementById('user-avatar');
+  const nm = document.getElementById('user-name');
+  if (av) {
+    document.getElementById('user-avatar-desk').textContent = av.textContent;
+    document.getElementById('user-name-desk').textContent   = nm.textContent;
+  }
+
   if (localStorage.getItem('theme') === 'dark') {
     dark = true;
     applyTheme();
-    document.getElementById('tbtn').innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i> Light';
-    ['tbtn2','tbtn3','tbtn4','tbtn5','tbtn6'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = '<i class="ti ti-sun" aria-hidden="true"></i>';
-    });
+    setThemeButtons();
   }
-  seed();
+
   const todayM = (new Date().getMonth() + 1) + '月';
   const ams = getMonths();
   const ti = ams.indexOf(todayM);
