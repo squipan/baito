@@ -107,7 +107,7 @@ document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">')
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
 <style>
@@ -137,7 +137,7 @@ document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">')
   --red: #c0392b;
   --sidebar-w: 220px;
   --font: 'Outfit', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+  --mono: 'Outfit', sans-serif;
   --r: 12px;
   --r-sm: 8px;
 }
@@ -466,7 +466,11 @@ html, body {
 .gb-val { font-size: 22px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
 
 /* ─── MISC ────────────────────────────────────────────────── */
-.dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
+.ic-val, .sc-val, .actual-big, .pp-val, .e-amt, .wacc-amt, .wg-val,
+.smc-total, .smc-val, .syb-val, .gb-val, .tot-row td, .inp-row input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+} height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
 .dot.done { background: var(--green); }
 .dot.up { background: var(--text3); }
 .empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px 0; line-height: 1.6; }
