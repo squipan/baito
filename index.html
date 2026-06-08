@@ -95,15 +95,88 @@ window.signOutUser = async function() {
 
 <script>
 const manifestData = {
-  name: "My Income Tracker", short_name: "My Income",
-  start_url: "./", display: "standalone",
-  background_color: "#0d1117", theme_color: "#1D9E75",
+  name: "My Income Tracker",
+  short_name: "My Income",
+  description: "Track shifts, English lessons and gas",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#ffffff",
+  theme_color: "#1D9E75",
   icons: [
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%231D9E75'/><text x='96' y='120' font-size='80' text-anchor='middle'>💴</text></svg>", sizes: "192x192", type: "image/svg+xml" }
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%231D9E75'/><rect x='28' y='58' width='136' height='88' rx='12' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='2'/><rect x='28' y='80' width='136' height='3' fill='rgba(255,255,255,0.35)'/><circle cx='62' cy='103' r='13' fill='white' opacity='0.9'/><circle cx='86' cy='103' r='13' fill='white' opacity='0.5'/><rect x='104' y='95' width='44' height='8' rx='4' fill='rgba(255,255,255,0.45)'/><rect x='104' y='109' width='30' height='6' rx='3' fill='rgba(255,255,255,0.3)'/><text x='96' y='168' font-size='16' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='2'>収入</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231D9E75'/><rect x='74' y='152' width='364' height='234' rx='32' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='5'/><rect x='74' y='212' width='364' height='8' fill='rgba(255,255,255,0.35)'/><circle cx='166' cy='270' r='36' fill='white' opacity='0.9'/><circle cx='230' cy='270' r='36' fill='white' opacity='0.5'/><rect x='276' y='248' width='118' height='22' rx='11' fill='rgba(255,255,255,0.45)'/><rect x='276' y='280' width='80' height='16' rx='8' fill='rgba(255,255,255,0.3)'/><text x='256' y='448' font-size='44' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='4'>収入</text></svg>", sizes: "512x512", type: "image/svg+xml" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
+<script>
+(function(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 180;
+  const ctx = c.getContext('2d');
+
+  const r = 38;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
+  ctx.quadraticCurveTo(180, 0, 180, r);
+  ctx.lineTo(180, 180-r);
+  ctx.quadraticCurveTo(180, 180, 180-r, 180);
+  ctx.lineTo(r, 180);
+  ctx.quadraticCurveTo(0, 180, 0, 180-r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = '#1D9E75';
+  ctx.fill();
+
+  ctx.beginPath();
+  roundRect(ctx, 22, 52, 136, 84, 12);
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.32)';
+  ctx.fillRect(22, 74, 136, 7);
+
+  ctx.beginPath(); ctx.arc(56, 98, 13, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(78, 98, 13, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.42)';
+  ctx.beginPath(); roundRect(ctx, 100, 90, 44, 8, 4); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.beginPath(); roundRect(ctx, 100, 104, 30, 6, 3); ctx.fill();
+
+  ctx.font = '700 17px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  ctx.textAlign = 'center';
+  ctx.fillText('収入', 90, 158);
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);
+    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+  }
+
+  const url = c.toDataURL('image/png');
+  const link = document.createElement('link');
+  link.rel = 'apple-touch-icon';
+  link.href = url;
+  document.head.appendChild(link);
+})();
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
