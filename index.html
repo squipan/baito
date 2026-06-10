@@ -1300,7 +1300,6 @@ function renderMonths() {
   document.getElementById('m-title').textContent = month;
   document.getElementById('arr-p').disabled = curMonth === 0;
   document.getElementById('arr-n').disabled = curMonth === ms.length - 1;
-  addSwipe(document.getElementById('page-months'), () => chMonth(1), () => chMonth(-1));
   const shifts = gd('shifts').filter(s => s.month === month).sort((a,b) => a.date.localeCompare(b.date));
   const actuals = gd('actuals') || {};
   const yr = shifts[0] ? shifts[0].date.slice(0,4) : new Date().getFullYear().toString();
@@ -1354,6 +1353,7 @@ function renderMonths() {
     </tr>`;
   }
   document.getElementById('m-tbody').innerHTML = rows;
+  addSwipe(document.getElementById('page-months'), () => chMonth(1), () => chMonth(-1));
 }
 function saveActual(akey) {
   const v = parseFloat(document.getElementById('act-inp').value);
@@ -1365,7 +1365,6 @@ function delShift(id) {
   sd('shifts', gd('shifts').filter(s => s.id !== id));
   renderMonths(); renderHome();
 }
-
 /* ── ENGLISH ── */
 function renderEnglish() {
   const items = (gd('english') || []).sort((a,b) => (a.year+a.month).localeCompare(b.year+b.month));
