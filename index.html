@@ -1280,7 +1280,16 @@ function qlSubmit() {
   toast('Shift added ✓');
   renderHome();
 }
-
+function addSwipe(el, onLeft, onRight) {
+  let x0 = null;
+  el.addEventListener('touchstart', e => x0 = e.touches[0].clientX, {passive:true});
+  el.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 50) dx < 0 ? onLeft() : onRight();
+    x0 = null;
+  }, {passive:true});
+}
 /* ── MONTHS ── */
 function getMonths() { const seen = new Set(gd('shifts').map(s => s.month)); return MONTHS.filter(m => seen.has(m)); }
 function chMonth(d) { const ms = getMonths(); curMonth = Math.max(0, Math.min(ms.length-1, curMonth+d)); renderMonths(); }
@@ -1291,6 +1300,7 @@ function renderMonths() {
   document.getElementById('m-title').textContent = month;
   document.getElementById('arr-p').disabled = curMonth === 0;
   document.getElementById('arr-n').disabled = curMonth === ms.length - 1;
+  addSwipe(document.getElementById('page-months'), () => chMonth(1), () => chMonth(-1));
   const shifts = gd('shifts').filter(s => s.month === month).sort((a,b) => a.date.localeCompare(b.date));
   const actuals = gd('actuals') || {};
   const yr = shifts[0] ? shifts[0].date.slice(0,4) : new Date().getFullYear().toString();
@@ -1379,6 +1389,7 @@ function renderEnglish() {
     <span style="font-size:16px;font-weight:500;color:var(--blue);font-family:var(--mono)">${yen(total)}</span>
   </div>`;
   el.innerHTML = html;
+document.getElementById('e-month').value = (new Date().getMonth()+1) + '月';
 }
 function addEnglish() {
   const month = document.getElementById('e-month').value;
