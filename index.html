@@ -1236,13 +1236,13 @@ function renderHome() {
     <div class="ic"><div class="ic-lbl">English ${yr}</div><div class="ic-val b">${yen(engTotal)}</div></div>
   `;
   const el = document.getElementById('ql-date');
-  if (!el.value) {
-    const y = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
-    el.value = `${y}-${mo}-${d}`;
-    document.getElementById('ql-day').value = DAYS[now.getDay()];
-    document.getElementById('ql-month').value = (now.getMonth()+1) + '月';
-    qlCalc();
-  }
+if (!el.value) {
+  const y = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+  el.value = `${y}-${mo}-${d}`;
+  document.getElementById('ql-day').value = DAYS[now.getDay()];
+  qlCalc();
+}
+document.getElementById('ql-month').value = (now.getMonth()+1) + '月';
 }
 function qlDate() {
   const v = document.getElementById('ql-date').value; if (!v) return;
