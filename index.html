@@ -1599,6 +1599,7 @@ function renderSalary() {
   document.getElementById('sal-rent').placeholder    = d.rent.toLocaleString('ja-JP') + ' (default)';
   document.getElementById('sal-car').placeholder     = d.car.toLocaleString('ja-JP') + ' (default)';
   document.getElementById('sal-wallets').placeholder = d.wallets.toLocaleString('ja-JP') + ' (default)';
+  document.getElementById('sal-month').value = (new Date().getMonth()+1) + '月';
   if (!items.length) { el.innerHTML = '<div class="empty">No salary logged yet</div>'; return; }
   let html = '';
   items.forEach(x => {
