@@ -117,64 +117,32 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
   const c = document.createElement('canvas');
   c.width = c.height = 180;
   const ctx = c.getContext('2d');
-
   const r = 38;
   ctx.beginPath();
-  ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
-  ctx.quadraticCurveTo(180, 0, 180, r);
-  ctx.lineTo(180, 180-r);
-  ctx.quadraticCurveTo(180, 180, 180-r, 180);
-  ctx.lineTo(r, 180);
-  ctx.quadraticCurveTo(0, 180, 0, 180-r);
-  ctx.lineTo(0, r);
-  ctx.quadraticCurveTo(0, 0, r, 0);
-  ctx.closePath();
-  ctx.fillStyle = '#1D9E75';
-  ctx.fill();
-
-  ctx.beginPath();
-  roundRect(ctx, 22, 52, 136, 84, 12);
-  ctx.fillStyle = 'rgba(255,255,255,0.18)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.38)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  ctx.fillStyle = 'rgba(255,255,255,0.32)';
-  ctx.fillRect(22, 74, 136, 7);
-
-  ctx.beginPath(); ctx.arc(56, 98, 13, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(78, 98, 13, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
-
-  ctx.fillStyle = 'rgba(255,255,255,0.42)';
-  ctx.beginPath(); roundRect(ctx, 100, 90, 44, 8, 4); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.28)';
-  ctx.beginPath(); roundRect(ctx, 100, 104, 30, 6, 3); ctx.fill();
-
-  ctx.font = '700 17px system-ui, -apple-system, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.88)';
-  ctx.textAlign = 'center';
-  ctx.fillText('収入', 90, 158);
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
-    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-    ctx.lineTo(x+w, y+h-r);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    ctx.lineTo(x+r, y+h);
-    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-    ctx.lineTo(x, y+r);
-    ctx.quadraticCurveTo(x, y, x+r, y);
-    ctx.closePath();
+  ctx.moveTo(r,0); ctx.lineTo(180-r,0); ctx.quadraticCurveTo(180,0,180,r);
+  ctx.lineTo(180,180-r); ctx.quadraticCurveTo(180,180,180-r,180);
+  ctx.lineTo(r,180); ctx.quadraticCurveTo(0,180,0,180-r);
+  ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0); ctx.closePath();
+  ctx.fillStyle = '#1D9E75'; ctx.fill();
+  ctx.beginPath(); roundRect(ctx,22,52,136,84,12);
+  ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.38)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.32)'; ctx.fillRect(22,74,136,7);
+  ctx.beginPath(); ctx.arc(56,98,13,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(78,98,13,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.42)'; ctx.beginPath(); roundRect(ctx,100,90,44,8,4); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.28)'; ctx.beginPath(); roundRect(ctx,100,104,30,6,3); ctx.fill();
+  ctx.font='700 17px system-ui,-apple-system,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.88)';
+  ctx.textAlign='center'; ctx.fillText('収入',90,158);
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
   }
-
-  const url = c.toDataURL('image/png');
   const link = document.createElement('link');
-  link.rel = 'apple-touch-icon';
-  link.href = url;
+  link.rel='apple-touch-icon'; link.href=c.toDataURL('image/png');
   document.head.appendChild(link);
 })();
 </script>
@@ -184,250 +152,72 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
 <style>
-/* ─── LIGHT THEME ─────────────────────────────────────────── */
 :root {
-  --bg: #f7f6f2;
-  --bg2: #eeede8;
-  --card: #ffffff;
-  --card2: #f0efe9;
-  --text: #111111;
-  --text2: #666666;
-  --text3: #aaaaaa;
-  --border: rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.18);
-  --green: #1D9E75;
-  --green-bg: #e1f5ee;
-  --green-text: #085041;
-  --amber: #9a6800;
-  --amber-bg: #fdf3dc;
-  --amber-text: #5a3800;
-  --blue: #1a6fb5;
-  --blue-bg: #e6f1fb;
-  --blue-text: #0c447c;
-  --purple: #534AB7;
-  --purple-bg: #EEEDFE;
-  --purple-text: #3C3489;
-  --red: #c0392b;
-  --sidebar-w: 220px;
-  --font: 'Outfit', sans-serif;
-  --mono: 'Outfit', sans-serif;
-  --r: 12px;
-  --r-sm: 8px;
+  --bg: #f7f6f2; --bg2: #eeede8; --card: #ffffff; --card2: #f0efe9;
+  --text: #111111; --text2: #666666; --text3: #aaaaaa;
+  --border: rgba(0,0,0,0.09); --border2: rgba(0,0,0,0.18);
+  --green: #1D9E75; --green-bg: #e1f5ee; --green-text: #085041;
+  --amber: #9a6800; --amber-bg: #fdf3dc; --amber-text: #5a3800;
+  --blue: #1a6fb5; --blue-bg: #e6f1fb; --blue-text: #0c447c;
+  --purple: #534AB7; --purple-bg: #EEEDFE; --purple-text: #3C3489;
+  --red: #c0392b; --sidebar-w: 220px;
+  --font: 'Outfit', sans-serif; --mono: 'Outfit', sans-serif;
+  --r: 12px; --r-sm: 8px;
 }
-
-/* ─── DARK THEME — trading dashboard palette ──────────────── */
 .dark {
-  --bg: #0d1117;
-  --bg2: #111820;
-  --card: #161b27;
-  --card2: #1c2333;
-  --text: #e6edf3;
-  --text2: #8b949e;
-  --text3: #484f58;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.12);
-  --green: #00e5a0;
-  --green-bg: #0a2a1e;
-  --green-text: #00e5a0;
-  --amber: #f0a500;
-  --amber-bg: #1f1600;
-  --amber-text: #f0c040;
-  --blue: #58a6ff;
-  --blue-bg: #0d1f3c;
-  --blue-text: #79c0ff;
-  --purple: #bc8cff;
-  --purple-bg: #1a1040;
-  --purple-text: #d2a8ff;
+  --bg: #0d1117; --bg2: #111820; --card: #161b27; --card2: #1c2333;
+  --text: #e6edf3; --text2: #8b949e; --text3: #484f58;
+  --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.12);
+  --green: #00e5a0; --green-bg: #0a2a1e; --green-text: #00e5a0;
+  --amber: #f0a500; --amber-bg: #1f1600; --amber-text: #f0c040;
+  --blue: #58a6ff; --blue-bg: #0d1f3c; --blue-text: #79c0ff;
+  --purple: #bc8cff; --purple-bg: #1a1040; --purple-text: #d2a8ff;
   --red: #f85149;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-html, body {
-  height: 100%; overflow: hidden;
-  background: var(--bg, #0d1117);
-  font-family: var(--font);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-/* ══════════════════════════════════════════════
-   LOGIN SCREEN
-══════════════════════════════════════════════ */
-#login-screen {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; height: 100vh;
-  background: var(--bg); padding: 32px; gap: 24px;
-}
-.login-icon {
-  width: 72px; height: 72px; background: var(--green);
-  border-radius: 20px; display: flex; align-items: center;
-  justify-content: center; font-size: 36px;
-}
+html, body { height: 100%; overflow: hidden; background: var(--bg,#0d1117); font-family: var(--font); color: var(--text); font-size: 14px; line-height: 1.4; }
+#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: var(--bg); padding: 32px; gap: 24px; }
+.login-icon { width: 72px; height: 72px; background: var(--green); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
 .login-title { font-size: 24px; font-weight: 500; letter-spacing: -0.3px; color: var(--text); text-align: center; }
 .login-sub { font-size: 13px; color: var(--text3); margin-top: 6px; text-align: center; }
-.login-btn {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--card); border: 0.5px solid var(--border2);
-  border-radius: 12px; padding: 14px 24px; font-size: 14px;
-  font-weight: 500; color: var(--text); cursor: pointer;
-  font-family: var(--font); width: 100%; max-width: 280px; justify-content: center;
-}
+.login-btn { display: flex; align-items: center; gap: 10px; background: var(--card); border: 0.5px solid var(--border2); border-radius: 12px; padding: 14px 24px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; font-family: var(--font); width: 100%; max-width: 280px; justify-content: center; }
 .login-note { font-size: 11px; color: var(--text3); text-align: center; line-height: 1.6; }
-
-/* ══════════════════════════════════════════════
-   APP SHELL — MOBILE FIRST, DESKTOP ENHANCED
-══════════════════════════════════════════════ */
-#app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* ─── DESKTOP SIDEBAR ─────────────────────────────────────── */
-#sidebar {
-  display: none; /* hidden on mobile */
-  flex-direction: column;
-  width: var(--sidebar-w);
-  background: var(--card);
-  border-right: 0.5px solid var(--border2);
-  flex-shrink: 0;
-  height: 100vh;
-  position: fixed;
-  left: 0; top: 0;
-  z-index: 200;
-  padding: 0 0 16px;
-  overflow-y: auto;
-}
+#app { display: flex; flex-direction: column; height: 100vh; background: var(--bg); color: var(--text); }
+#sidebar { display: none; flex-direction: column; width: var(--sidebar-w); background: var(--card); border-right: 0.5px solid var(--border2); flex-shrink: 0; height: 100vh; position: fixed; left: 0; top: 0; z-index: 200; padding: 0 0 16px; overflow-y: auto; }
 #sidebar::-webkit-scrollbar { display: none; }
-
-.sidebar-logo {
-  display: flex; align-items: center; gap: 10px;
-  padding: 20px 18px 16px;
-  border-bottom: 0.5px solid var(--border);
-  margin-bottom: 8px;
-}
-.sidebar-logo-icon {
-  width: 32px; height: 32px; background: var(--green);
-  border-radius: 8px; display: flex; align-items: center;
-  justify-content: center; font-size: 16px; flex-shrink: 0;
-}
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; border-bottom: 0.5px solid var(--border); margin-bottom: 8px; }
+.sidebar-logo-icon { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .sidebar-logo-text { font-size: 14px; font-weight: 500; color: var(--text); letter-spacing: -0.2px; }
-
 .sidebar-nav { flex: 1; padding: 4px 10px; }
-.snb {
-  display: flex; align-items: center; gap: 10px;
-  width: 100%; background: none; border: none;
-  padding: 9px 10px; border-radius: var(--r-sm);
-  color: var(--text2); font-family: var(--font);
-  font-size: 13px; font-weight: 400; cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  text-align: left; margin-bottom: 2px;
-}
+.snb { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; padding: 9px 10px; border-radius: var(--r-sm); color: var(--text2); font-family: var(--font); font-size: 13px; font-weight: 400; cursor: pointer; transition: background 0.15s, color 0.15s; text-align: left; margin-bottom: 2px; }
 .snb i { font-size: 18px; flex-shrink: 0; }
 .snb:hover { background: var(--card2); color: var(--text); }
 .snb.active { background: var(--green-bg); color: var(--green); font-weight: 500; }
-
-.sidebar-bottom {
-  padding: 10px 10px 0;
-  border-top: 0.5px solid var(--border);
-  margin: 8px 0 0;
-}
-.sidebar-user {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border-radius: var(--r-sm);
-}
-.s-avatar {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--green); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 600; flex-shrink: 0;
-}
+.sidebar-bottom { padding: 10px 10px 0; border-top: 0.5px solid var(--border); margin: 8px 0 0; }
+.sidebar-user { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--r-sm); }
+.s-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
 .s-name { font-size: 12px; color: var(--text2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .s-actions { display: flex; gap: 4px; align-items: center; }
-.s-btn {
-  background: none; border: none; color: var(--text3);
-  cursor: pointer; font-size: 16px; padding: 4px;
-  border-radius: 6px; display: flex; align-items: center; justify-content: center;
-}
+.s-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 .s-btn:hover { color: var(--text); background: var(--card2); }
-
-/* ─── DESKTOP MAIN AREA ───────────────────────────────────── */
-#main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ─── DESKTOP TOPBAR ──────────────────────────────────────── */
-#desktop-topbar {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  height: 56px;
-  background: var(--card);
-  border-bottom: 0.5px solid var(--border2);
-  flex-shrink: 0;
-}
+#main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#desktop-topbar { display: none; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; background: var(--card); border-bottom: 0.5px solid var(--border2); flex-shrink: 0; }
 .dt-title { font-size: 16px; font-weight: 500; color: var(--text); letter-spacing: -0.2px; }
 .dt-actions { display: flex; gap: 8px; align-items: center; }
-.tbtn {
-  background: var(--card2); border: 0.5px solid var(--border2);
-  border-radius: 99px; padding: 6px 13px; font-size: 12px;
-  color: var(--text2); cursor: pointer; font-family: var(--font);
-  display: flex; align-items: center; gap: 5px;
-}
+.tbtn { background: var(--card2); border: 0.5px solid var(--border2); border-radius: 99px; padding: 6px 13px; font-size: 12px; color: var(--text2); cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 5px; }
 .tbtn:active { opacity: 0.7; }
-
-/* ─── SCROLL AREA ─────────────────────────────────────────── */
-.scroll-area {
-  flex: 1; overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 16px 14px 90px;
-  background: var(--bg);
-}
+.scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 90px; background: var(--bg); }
 .scroll-area::-webkit-scrollbar { display: none; }
-
-/* ─── MOBILE BOTTOM NAV ───────────────────────────────────── */
-.bnav {
-  display: grid; grid-template-columns: repeat(6, 1fr);
-  background: var(--card); border-top: 0.5px solid var(--border2);
-  padding: 8px 0 max(10px, env(safe-area-inset-bottom));
-  position: sticky; bottom: 0; z-index: 100;
-}
-.nb {
-  background: none; border: none; display: flex; flex-direction: column;
-  align-items: center; gap: 3px; padding: 4px 2px; cursor: pointer;
-  color: var(--text3); font-family: var(--font); font-size: 10px; font-weight: 400;
-  transition: color 0.15s;
-}
+.bnav { display: grid; grid-template-columns: repeat(6, 1fr); background: var(--card); border-top: 0.5px solid var(--border2); padding: 8px 0 max(10px, env(safe-area-inset-bottom)); position: sticky; bottom: 0; z-index: 100; }
+.nb { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 2px; cursor: pointer; color: var(--text3); font-family: var(--font); font-size: 10px; font-weight: 400; transition: color 0.15s; }
 .nb i { font-size: 22px; }
 .nb.active { color: var(--green); }
-
-/* ─── PAGES ───────────────────────────────────────────────── */
 .page { display: none; }
 .page.active { display: block; }
-
-/* ─── MOBILE TOPBAR (inside page) ────────────────────────── */
-.topbar {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 18px;
-}
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .pg-title { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; color: var(--text); }
-
-/* ─── CARDS ───────────────────────────────────────────────── */
-.card {
-  background: var(--card); border: 0.5px solid var(--border);
-  border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
-}
+.card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px; }
 .card2 { background: var(--card2); border-radius: var(--r); padding: 13px 15px; margin-bottom: 12px; }
-
-/* ─── HOME HERO ───────────────────────────────────────────── */
 .hero-date { font-size: 28px; font-weight: 300; letter-spacing: -0.5px; color: var(--text); }
 .hero-weekday { font-size: 13px; color: var(--text2); margin-top: 2px; margin-bottom: 14px; }
 .hero-divider { border: none; border-top: 0.5px solid var(--border); margin-bottom: 14px; }
@@ -437,79 +227,41 @@ html, body {
 .ic-val { font-size: 18px; font-weight: 500; }
 .ic-val.g { color: var(--green); }
 .ic-val.b { color: var(--blue); }
-
-/* ─── FORM ELEMENTS ───────────────────────────────────────── */
 .card-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
 .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .f label { font-size: 10px; color: var(--text3); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
-.f input, .f select {
-  width: 100%; background: var(--bg); border: 0.5px solid var(--border2);
-  border-radius: var(--r-sm); padding: 9px 11px; font-size: 13px;
-  color: var(--text); font-family: var(--font); outline: none;
-  -webkit-appearance: none;
-}
+.f input, .f select { width: 100%; background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--r-sm); padding: 9px 11px; font-size: 13px; color: var(--text); font-family: var(--font); outline: none; -webkit-appearance: none; }
 .f input:focus, .f select:focus { border-color: var(--green); }
 .f input[readonly] { color: var(--text2); background: var(--card2); }
 .f select option { background: var(--card); color: var(--text); }
-
-.preview-pill {
-  background: var(--amber-bg); border-radius: var(--r-sm); padding: 9px 12px;
-  margin-bottom: 8px; display: none; justify-content: space-between; align-items: center;
-}
+.preview-pill { background: var(--amber-bg); border-radius: var(--r-sm); padding: 9px 12px; margin-bottom: 8px; display: none; justify-content: space-between; align-items: center; }
 .preview-pill.show { display: flex; }
 .pp-lbl { font-size: 10px; color: var(--amber-text); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
 .pp-val { font-size: 16px; font-weight: 500; color: var(--amber-text); font-family: var(--mono); }
-
-.btn-add {
-  width: 100%; background: var(--green); color: #fff; border: none;
-  border-radius: var(--r-sm); padding: 11px; font-size: 14px; font-weight: 500;
-  cursor: pointer; font-family: var(--font); letter-spacing: -0.1px;
-  transition: opacity 0.15s;
-}
+.btn-add { width: 100%; background: var(--green); color: #fff; border: none; border-radius: var(--r-sm); padding: 11px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--font); letter-spacing: -0.1px; transition: opacity 0.15s; }
 .btn-add:active { opacity: 0.8; }
 .dark .btn-add { color: #0d1117; }
-
-/* ─── MONTH NAV ───────────────────────────────────────────── */
 .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .m-title { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; color: var(--text); }
 .arrows { display: flex; gap: 6px; }
-.arr {
-  background: var(--card2); border: 0.5px solid var(--border2);
-  border-radius: var(--r-sm); width: 36px; height: 36px; font-size: 18px;
-  cursor: pointer; color: var(--text2); display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
+.arr { background: var(--card2); border: 0.5px solid var(--border2); border-radius: var(--r-sm); width: 36px; height: 36px; font-size: 18px; cursor: pointer; color: var(--text2); display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 .arr:hover { background: var(--card); }
 .arr:disabled { opacity: 0.3; cursor: default; }
-
-/* ─── STATS ───────────────────────────────────────────────── */
 .stat3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 12px; }
 .sc { background: var(--card2); border-radius: var(--r-sm); padding: 10px 11px; }
 .sc-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
 .sc-val { font-size: 15px; font-weight: 500; font-family: var(--mono); color: var(--text); }
 .sc-val.g { color: var(--green); }
 .sc-val.a { color: var(--amber); }
-
-/* ─── ACTUAL SALARY ───────────────────────────────────────── */
 .actual-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .actual-big { font-size: 22px; font-weight: 500; color: var(--green); font-family: var(--mono); margin-bottom: 2px; }
 .actual-diff { font-size: 11px; margin-bottom: 10px; }
 .actual-pending { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
 .inp-row { display: flex; gap: 6px; }
-.inp-row input {
-  flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
-  border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
-  color: var(--text); font-family: var(--mono); outline: none;
-}
+.inp-row input { flex: 1; background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500; color: var(--text); font-family: var(--mono); outline: none; }
 .inp-row input:focus { border-color: var(--green); }
-.inp-row button {
-  background: var(--green); color: #fff; border: none;
-  border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500;
-  cursor: pointer; font-family: var(--font);
-}
+.inp-row button { background: var(--green); color: #fff; border: none; border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font); }
 .dark .inp-row button { color: #0d1117; }
-
-/* ─── TABLE ───────────────────────────────────────────────── */
 .sec-hd { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 8px; }
 .shift-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .shift-tbl th { font-size: 10px; color: var(--text3); font-weight: 400; padding: 0 4px 7px; text-align: left; border-bottom: 0.5px solid var(--border2); letter-spacing: 0.03em; text-transform: uppercase; }
@@ -523,8 +275,6 @@ html, body {
 .del-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 15px; padding: 0 3px; border-radius: 3px; }
 .del-btn:hover { color: var(--red); }
 .tot-row td { font-size: 11px; color: var(--text2); padding-top: 10px; border-top: 0.5px solid var(--border2) !important; border-bottom: none !important; font-family: var(--mono); }
-
-/* ─── LIST ENTRIES ────────────────────────────────────────── */
 .mgrp { font-size: 11px; font-weight: 500; color: var(--text2); padding: 8px 0 4px; border-bottom: 0.5px solid var(--border2); margin-bottom: 3px; }
 .entry { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
 .entry:last-of-type { border-bottom: none; }
@@ -532,35 +282,20 @@ html, body {
 .e-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 .e-amt { font-size: 14px; font-weight: 500; font-family: var(--mono); color: var(--text); }
 .total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; border-top: 0.5px solid var(--border2); margin-top: 4px; }
-
-/* ─── GAS ─────────────────────────────────────────────────── */
 .gas-banner { background: var(--green-bg); border-radius: var(--r); padding: 13px 15px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
 .gb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
 .gb-val { font-size: 22px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
-
-/* ─── MISC ────────────────────────────────────────────────── */
 .ic-val, .sc-val, .actual-big, .pp-val, .e-amt, .wacc-amt, .wg-val,
-.smc-total, .smc-val, .syb-val, .gb-val, .tot-row td, .inp-row input {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.3px;
-} height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
+.smc-total, .smc-val, .syb-val, .gb-val, .tot-row td, .inp-row input { font-variant-numeric: tabular-nums; letter-spacing: -0.3px; }
+.dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
 .dot.done { background: var(--green); }
 .dot.up { background: var(--text3); }
 .empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px 0; line-height: 1.6; }
 .toast-wrap { text-align: center; min-height: 30px; margin-top: 6px; }
-.toast {
-  background: var(--text); color: var(--card); padding: 6px 18px;
-  border-radius: 99px; font-size: 11px; opacity: 0; transition: opacity 0.2s;
-  pointer-events: none; display: inline-block;
-}
+.toast { background: var(--text); color: var(--card); padding: 6px 18px; border-radius: 99px; font-size: 11px; opacity: 0; transition: opacity 0.2s; pointer-events: none; display: inline-block; }
 .toast.show { opacity: 1; }
-
-/* ─── WALLET ──────────────────────────────────────────────── */
-.wallet-grand {
-  background: var(--green); border-radius: var(--r);
-  padding: 18px 18px; margin-bottom: 14px;
-}
-.dark .wallet-grand { background: linear-gradient(135deg, #003d2a 0%, #004d35 100%); border: 0.5px solid var(--green); }
+.wallet-grand { background: var(--green); border-radius: var(--r); padding: 18px 18px; margin-bottom: 14px; }
+.dark .wallet-grand { background: linear-gradient(135deg,#003d2a 0%,#004d35 100%); border: 0.5px solid var(--green); }
 .wg-lbl { font-size: 10px; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
 .dark .wg-lbl { color: var(--green); }
 .wg-val { font-size: 32px; font-weight: 500; color: #fff; font-family: var(--mono); letter-spacing: -1px; }
@@ -568,16 +303,9 @@ html, body {
 .wg-updated { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px; }
 .dark .wg-updated { color: var(--text3); }
 .wallet-accounts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-.wacc {
-  background: var(--card); border: 0.5px solid var(--border);
-  border-radius: var(--r); padding: 14px 16px;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-}
+.wacc { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .wacc-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; }
-.wacc-icon {
-  width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; font-size: 18px; flex-shrink: 0;
-}
+.wacc-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 .wacc-icon.ufj { background: var(--blue-bg); color: var(--blue); }
 .wacc-icon.yucho { background: var(--amber-bg); color: var(--amber); }
 .wacc-icon.english { background: var(--purple-bg); color: var(--purple); }
@@ -590,28 +318,15 @@ html, body {
 .wacc-amt.english { color: var(--purple); }
 .wacc-edit { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px; margin-top: 2px; }
 .wacc-edit:hover { color: var(--green); }
-.wallet-edit-form {
-  background: var(--card2); border-radius: var(--r-sm);
-  padding: 12px 14px; margin-top: 10px; display: none;
-}
+.wallet-edit-form { background: var(--card2); border-radius: var(--r-sm); padding: 12px 14px; margin-top: 10px; display: none; }
 .wallet-edit-form.open { display: block; }
 .we-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
 .we-row { display: flex; gap: 6px; }
-.we-row input {
-  flex: 1; background: var(--bg); border: 0.5px solid var(--border2);
-  border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500;
-  color: var(--text); font-family: var(--mono); outline: none;
-}
+.we-row input { flex: 1; background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--r-sm); padding: 9px 11px; font-size: 14px; font-weight: 500; color: var(--text); font-family: var(--mono); outline: none; }
 .we-row input:focus { border-color: var(--green); }
-.we-row button {
-  background: var(--green); color: #fff; border: none;
-  border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500;
-  cursor: pointer; font-family: var(--font);
-}
+.we-row button { background: var(--green); color: #fff; border: none; border-radius: var(--r-sm); padding: 9px 16px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font); }
 .dark .we-row button { color: #0d1117; }
 .wallet-note { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0 2px; line-height: 1.6; }
-
-/* ─── SALARY ──────────────────────────────────────────────── */
 .salary-month-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
 .smc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .smc-month { font-size: 15px; font-weight: 500; color: var(--text); }
@@ -629,99 +344,31 @@ html, body {
 .syb-lbl { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
 .syb-val { font-size: 24px; font-weight: 500; color: var(--green-text); font-family: var(--mono); }
 
-/* ══════════════════════════════════════════════
-   DESKTOP BREAKPOINT  (≥ 768px)
-══════════════════════════════════════════════ */
 @media (min-width: 768px) {
-
-  #app {
-    flex-direction: row;
-    max-width: none;
-    margin: 0;
-  }
-
-  #sidebar {
-    display: flex;
-    position: relative;
-    height: 100vh;
-    flex-shrink: 0;
-  }
-
-  #main-area {
-    margin-left: 0;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  #desktop-topbar {
-    display: flex;
-  }
-
-  .bnav {
-    display: none;
-  }
-
-  /* Hide mobile-only topbars inside pages */
-  .page .topbar {
-    display: none;
-  }
-
-  .scroll-area {
-    padding: 24px 28px 40px;
-    max-width: 860px;
-  }
-
-  /* Desktop content layout improvements */
-  .income-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .stat3 {
-    gap: 10px;
-  }
-
-  .frow {
-    gap: 12px;
-  }
-
-  /* Wider cards on desktop */
-  .card, .card2 {
-    border-radius: 14px;
-  }
-
-  .salary-month-card {
-    border-radius: 14px;
-  }
-
-  /* Desktop hero */
-  .hero-date {
-    font-size: 34px;
-  }
-
-  /* Shift table columns */
-  .shift-tbl th, .shift-tbl td {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
+  #app { flex-direction: row; max-width: none; margin: 0; }
+  #sidebar { display: flex; position: relative; height: 100vh; flex-shrink: 0; }
+  #main-area { margin-left: 0; flex: 1; overflow: hidden; }
+  #desktop-topbar { display: flex; }
+  .bnav { display: none; }
+  .page .topbar { display: none; }
+  .scroll-area { padding: 24px 28px 40px; max-width: 860px; }
+  .income-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .stat3 { gap: 10px; }
+  .frow { gap: 12px; }
+  .card, .card2 { border-radius: 14px; }
+  .salary-month-card { border-radius: 14px; }
+  .hero-date { font-size: 34px; }
+  .shift-tbl th, .shift-tbl td { padding-left: 8px; padding-right: 8px; }
 }
-
 @media (min-width: 1100px) {
   :root { --sidebar-w: 240px; }
-
-  .scroll-area {
-    max-width: 960px;
-  }
-
-  .income-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .scroll-area { max-width: 960px; }
+  .income-grid { grid-template-columns: repeat(4,1fr); }
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════ LOGIN SCREEN ══════════════ -->
 <div id="login-screen" style="display:flex">
   <div class="login-icon">💴</div>
   <div>
@@ -735,34 +382,19 @@ html, body {
   <div class="login-note">Your data is stored securely in the cloud<br>and syncs across devices.</div>
 </div>
 
-<!-- ══════════════ APP ══════════════ -->
 <div id="app" style="display:none">
-
-  <!-- SIDEBAR (desktop) -->
   <nav id="sidebar">
     <div class="sidebar-logo">
       <div class="sidebar-logo-icon">💴</div>
       <div class="sidebar-logo-text">My Income</div>
     </div>
     <div class="sidebar-nav">
-      <button class="snb active" onclick="goPage('home')" data-page="home">
-        <i class="ti ti-home"></i> Home
-      </button>
-      <button class="snb" onclick="goPage('months')" data-page="months">
-        <i class="ti ti-calendar"></i> はま寿司
-      </button>
-      <button class="snb" onclick="goPage('english')" data-page="english">
-        <i class="ti ti-school"></i> English
-      </button>
-      <button class="snb" onclick="goPage('gas')" data-page="gas">
-        <i class="ti ti-gas-station"></i> Gasoline
-      </button>
-      <button class="snb" onclick="goPage('wallet')" data-page="wallet">
-        <i class="ti ti-wallet"></i> Wallet
-      </button>
-      <button class="snb" onclick="goPage('salary')" data-page="salary">
-        <i class="ti ti-briefcase"></i> Main Job
-      </button>
+      <button class="snb active" onclick="goPage('home')" data-page="home"><i class="ti ti-home"></i> Home</button>
+      <button class="snb" onclick="goPage('months')" data-page="months"><i class="ti ti-calendar"></i> はま寿司</button>
+      <button class="snb" onclick="goPage('english')" data-page="english"><i class="ti ti-school"></i> English</button>
+      <button class="snb" onclick="goPage('gas')" data-page="gas"><i class="ti ti-gas-station"></i> Gasoline</button>
+      <button class="snb" onclick="goPage('wallet')" data-page="wallet"><i class="ti ti-wallet"></i> Wallet</button>
+      <button class="snb" onclick="goPage('salary')" data-page="salary"><i class="ti ti-briefcase"></i> Main Job</button>
     </div>
     <div class="sidebar-bottom">
       <div class="sidebar-user">
@@ -776,10 +408,7 @@ html, body {
     </div>
   </nav>
 
-  <!-- MAIN AREA -->
   <div id="main-area">
-
-    <!-- Desktop topbar -->
     <div id="desktop-topbar">
       <div class="dt-title" id="dt-page-title">Home</div>
       <div class="dt-actions">
@@ -788,12 +417,10 @@ html, body {
       </div>
     </div>
 
-    <!-- SCROLL AREA -->
     <div class="scroll-area" id="scroll">
 
-      <!-- ── HOME ── -->
+      <!-- HOME -->
       <div class="page active" id="page-home">
-        <!-- mobile topbar -->
         <div class="topbar">
           <div style="display:flex;align-items:center;gap:8px">
             <div id="user-avatar" style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0"></div>
@@ -841,7 +468,7 @@ html, body {
         <div class="toast-wrap"><span class="toast" id="toast"></span></div>
       </div>
 
-      <!-- ── MONTHS ── -->
+      <!-- MONTHS -->
       <div class="page" id="page-months">
         <div class="topbar">
           <div class="pg-title">はま寿司</div>
@@ -870,7 +497,7 @@ html, body {
         </table>
       </div>
 
-      <!-- ── ENGLISH ── -->
+      <!-- ENGLISH -->
       <div class="page" id="page-english">
         <div class="topbar">
           <div class="pg-title">English</div>
@@ -897,7 +524,7 @@ html, body {
         <div id="english-list"></div>
       </div>
 
-      <!-- ── GAS ── -->
+      <!-- GAS -->
       <div class="page" id="page-gas">
         <div class="topbar">
           <div class="pg-title">Gasoline</div>
@@ -919,7 +546,7 @@ html, body {
         <div id="gas-list"></div>
       </div>
 
-      <!-- ── WALLET ── -->
+      <!-- WALLET -->
       <div class="page" id="page-wallet">
         <div class="topbar">
           <div class="pg-title">Wallet</div>
@@ -931,15 +558,11 @@ html, body {
           <div class="wg-updated" id="w-grand-sub"></div>
         </div>
         <div class="wallet-accounts">
-          <!-- UFJ -->
           <div>
             <div class="wacc">
               <div class="wacc-left">
                 <div class="wacc-icon ufj"><i class="ti ti-building-bank"></i></div>
-                <div>
-                  <div class="wacc-name">UFJ</div>
-                  <div class="wacc-updated" id="w-ufj-date">—</div>
-                </div>
+                <div><div class="wacc-name">UFJ</div><div class="wacc-updated" id="w-ufj-date">—</div></div>
               </div>
               <div class="wacc-right">
                 <div class="wacc-amt ufj" id="w-ufj-val">—</div>
@@ -948,21 +571,14 @@ html, body {
             </div>
             <div class="wallet-edit-form" id="edit-ufj">
               <div class="we-lbl">Current UFJ balance (¥)</div>
-              <div class="we-row">
-                <input type="number" id="inp-ufj" placeholder="e.g. 45000">
-                <button onclick="saveWallet('ufj')">Save</button>
-              </div>
+              <div class="we-row"><input type="number" id="inp-ufj" placeholder="e.g. 45000"><button onclick="saveWallet('ufj')">Save</button></div>
             </div>
           </div>
-          <!-- ゆうちょ -->
           <div>
             <div class="wacc">
               <div class="wacc-left">
                 <div class="wacc-icon yucho"><i class="ti ti-coin"></i></div>
-                <div>
-                  <div class="wacc-name">ゆうちょ</div>
-                  <div class="wacc-updated" id="w-yucho-date">—</div>
-                </div>
+                <div><div class="wacc-name">ゆうちょ</div><div class="wacc-updated" id="w-yucho-date">—</div></div>
               </div>
               <div class="wacc-right">
                 <div class="wacc-amt yucho" id="w-yucho-val">—</div>
@@ -971,36 +587,23 @@ html, body {
             </div>
             <div class="wallet-edit-form" id="edit-yucho">
               <div class="we-lbl">Current ゆうちょ balance (¥)</div>
-              <div class="we-row">
-                <input type="number" id="inp-yucho" placeholder="e.g. 20000">
-                <button onclick="saveWallet('yucho')">Save</button>
-              </div>
+              <div class="we-row"><input type="number" id="inp-yucho" placeholder="e.g. 20000"><button onclick="saveWallet('yucho')">Save</button></div>
             </div>
           </div>
-          <!-- English total -->
           <div>
             <div class="wacc">
               <div class="wacc-left">
                 <div class="wacc-icon english"><i class="ti ti-school"></i></div>
-                <div>
-                  <div class="wacc-name">English lessons</div>
-                  <div class="wacc-updated" id="w-english-date">All time total</div>
-                </div>
+                <div><div class="wacc-name">English lessons</div><div class="wacc-updated" id="w-english-date">All time total</div></div>
               </div>
-              <div class="wacc-right">
-                <div class="wacc-amt english" id="w-english-val">¥0</div>
-              </div>
+              <div class="wacc-right"><div class="wacc-amt english" id="w-english-val">¥0</div></div>
             </div>
           </div>
-          <!-- Cash -->
           <div>
             <div class="wacc">
               <div class="wacc-left">
                 <div class="wacc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-cash"></i></div>
-                <div>
-                  <div class="wacc-name">現金 / Cash</div>
-                  <div class="wacc-updated" id="w-cash-date">—</div>
-                </div>
+                <div><div class="wacc-name">現金 / Cash</div><div class="wacc-updated" id="w-cash-date">—</div></div>
               </div>
               <div class="wacc-right">
                 <div class="wacc-amt" style="color:var(--green)" id="w-cash-val">—</div>
@@ -1009,17 +612,14 @@ html, body {
             </div>
             <div class="wallet-edit-form" id="edit-cash">
               <div class="we-lbl">Current cash on hand (¥)</div>
-              <div class="we-row">
-                <input type="number" id="inp-cash" placeholder="e.g. 15000">
-                <button onclick="saveWallet('cash')">Save</button>
-              </div>
+              <div class="we-row"><input type="number" id="inp-cash" placeholder="e.g. 15000"><button onclick="saveWallet('cash')">Save</button></div>
             </div>
           </div>
         </div>
         <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
       </div>
 
-      <!-- ── SALARY ── -->
+      <!-- SALARY -->
       <div class="page" id="page-salary">
         <div class="topbar">
           <div class="pg-title">Main Job</div>
@@ -1076,10 +676,9 @@ html, body {
         <div id="salary-list"></div>
       </div>
 
-    </div><!-- /scroll-area -->
-  </div><!-- /main-area -->
+    </div>
+  </div>
 
-  <!-- MOBILE BOTTOM NAV -->
   <div class="bnav">
     <button class="nb active" onclick="goPage('home')"><i class="ti ti-home"></i><span>Home</span></button>
     <button class="nb" onclick="goPage('months')"><i class="ti ti-calendar"></i><span>Shifts</span></button>
@@ -1088,8 +687,7 @@ html, body {
     <button class="nb" onclick="goPage('wallet')"><i class="ti ti-wallet"></i><span>Wallet</span></button>
     <button class="nb" onclick="goPage('salary')"><i class="ti ti-briefcase"></i><span>Job</span></button>
   </div>
-
-</div><!-- /app -->
+</div>
 
 <script>
 if ('serviceWorker' in navigator) {
@@ -1107,8 +705,8 @@ if ('serviceWorker' in navigator) {
       e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html'))));
     });
   `;
-  const blob = new Blob([swCode], {type: 'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+  const swBlob = new Blob([swCode], {type: 'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
 }
 
 const DAYS    = ['日','月','火','水','木','金','土'];
@@ -1163,37 +761,40 @@ function toast(msg) {
 }
 
 function applyTheme() {
-  const app = document.getElementById('app');
-  const login = document.getElementById('login-screen');
-  app.classList.toggle('dark', dark);
-  login.classList.toggle('dark', dark);
+  document.getElementById('app').classList.toggle('dark', dark);
+  document.getElementById('login-screen').classList.toggle('dark', dark);
   document.documentElement.style.background = dark ? '#0d1117' : '#f7f6f2';
   document.body.style.background = dark ? '#0d1117' : '#f7f6f2';
 }
-
 function setThemeButtons() {
-  const icon  = dark ? 'ti-sun' : 'ti-moon';
+  const icon = dark ? 'ti-sun' : 'ti-moon';
   const label = dark ? 'Light' : 'Dark';
-  // desktop topbar
-  const tb = document.getElementById('tbtn');
-  if (tb) tb.innerHTML = `<i class="ti ${icon}"></i> ${label}`;
-  // desktop sidebar
-  const tbd = document.getElementById('theme-btn-desk');
-  if (tbd) tbd.innerHTML = `<i class="ti ${icon}"></i>`;
-  // mobile topbar
-  const tbm = document.getElementById('tbtn-mob');
-  if (tbm) tbm.innerHTML = `<i class="ti ${icon}"></i> ${label}`;
-  // page-level theme buttons (inside .topbar on mobile)
-  document.querySelectorAll('.page .topbar .tbtn').forEach(el => {
-    el.innerHTML = `<i class="ti ${icon}"></i>`;
-  });
+  const tb = document.getElementById('tbtn'); if (tb) tb.innerHTML = `<i class="ti ${icon}"></i> ${label}`;
+  const tbd = document.getElementById('theme-btn-desk'); if (tbd) tbd.innerHTML = `<i class="ti ${icon}"></i>`;
+  const tbm = document.getElementById('tbtn-mob'); if (tbm) tbm.innerHTML = `<i class="ti ${icon}"></i> ${label}`;
+  document.querySelectorAll('.page .topbar .tbtn').forEach(el => { el.innerHTML = `<i class="ti ${icon}"></i>`; });
+}
+function toggleTheme() {
+  dark = !dark; applyTheme(); setThemeButtons();
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
 }
 
-function toggleTheme() {
-  dark = !dark;
-  applyTheme();
-  setThemeButtons();
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
+/* ── SWIPE — defined once, registered once in _appReady ── */
+function addSwipe(el, onLeft, onRight) {
+  let x0 = null, y0 = null;
+  el.addEventListener('touchstart', e => {
+    x0 = e.touches[0].clientX;
+    y0 = e.touches[0].clientY;
+  }, {passive: true});
+  el.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 50) {
+      dx < 0 ? onLeft() : onRight();
+    }
+    x0 = null; y0 = null;
+  }, {passive: true});
 }
 
 function goPage(name) {
@@ -1201,14 +802,11 @@ function goPage(name) {
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.snb').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  // mobile bottom nav
   ['home','months','english','gas','wallet','salary'].forEach((n,i) => {
     if (n === name) document.querySelectorAll('.nb')[i].classList.add('active');
   });
-  // desktop sidebar
   const snb = document.querySelector(`.snb[data-page="${name}"]`);
   if (snb) snb.classList.add('active');
-  // desktop topbar title
   const dtt = document.getElementById('dt-page-title');
   if (dtt) dtt.textContent = PAGE_TITLES[name] || name;
   document.getElementById('scroll').scrollTop = 0;
@@ -1236,13 +834,13 @@ function renderHome() {
     <div class="ic"><div class="ic-lbl">English ${yr}</div><div class="ic-val b">${yen(engTotal)}</div></div>
   `;
   const el = document.getElementById('ql-date');
-if (!el.value) {
-  const y = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
-  el.value = `${y}-${mo}-${d}`;
-  document.getElementById('ql-day').value = DAYS[now.getDay()];
-  qlCalc();
-}
-document.getElementById('ql-month').value = (now.getMonth()+1) + '月';
+  if (!el.value) {
+    const y = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+    el.value = `${y}-${mo}-${d}`;
+    document.getElementById('ql-day').value = DAYS[now.getDay()];
+    qlCalc();
+  }
+  document.getElementById('ql-month').value = (now.getMonth()+1) + '月';
 }
 function qlDate() {
   const v = document.getElementById('ql-date').value; if (!v) return;
@@ -1280,16 +878,7 @@ function qlSubmit() {
   toast('Shift added ✓');
   renderHome();
 }
-function addSwipe(el, onLeft, onRight) {
-  let x0 = null;
-  el.addEventListener('touchstart', e => x0 = e.touches[0].clientX, {passive:true});
-  el.addEventListener('touchend', e => {
-    if (x0 === null) return;
-    const dx = e.changedTouches[0].clientX - x0;
-    if (Math.abs(dx) > 50) dx < 0 ? onLeft() : onRight();
-    x0 = null;
-  }, {passive:true});
-}
+
 /* ── MONTHS ── */
 function getMonths() { const seen = new Set(gd('shifts').map(s => s.month)); return MONTHS.filter(m => seen.has(m)); }
 function chMonth(d) { const ms = getMonths(); curMonth = Math.max(0, Math.min(ms.length-1, curMonth+d)); renderMonths(); }
@@ -1353,7 +942,7 @@ function renderMonths() {
     </tr>`;
   }
   document.getElementById('m-tbody').innerHTML = rows;
-  addSwipe(document.getElementById('page-months'), () => chMonth(1), () => chMonth(-1));
+  // NO addSwipe call here — registered once in _appReady
 }
 function saveActual(akey) {
   const v = parseFloat(document.getElementById('act-inp').value);
@@ -1365,12 +954,17 @@ function delShift(id) {
   sd('shifts', gd('shifts').filter(s => s.id !== id));
   renderMonths(); renderHome();
 }
+
 /* ── ENGLISH ── */
 function renderEnglish() {
   const items = (gd('english') || []).sort((a,b) => (a.year+a.month).localeCompare(b.year+b.month));
   const el = document.getElementById('english-list');
   const total = items.reduce((s, x) => s + (x.amount || 0), 0);
-  if (!items.length) { el.innerHTML = '<div class="empty">No payments yet</div>'; return; }
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">No payments yet</div>';
+    document.getElementById('e-month').value = (new Date().getMonth()+1) + '月';
+    return;
+  }
   let lastG = '', html = '';
   items.forEach(i => {
     const g = (i.year || '2026') + ' · ' + i.month;
@@ -1388,7 +982,7 @@ function renderEnglish() {
     <span style="font-size:16px;font-weight:500;color:var(--blue);font-family:var(--mono)">${yen(total)}</span>
   </div>`;
   el.innerHTML = html;
-document.getElementById('e-month').value = (new Date().getMonth()+1) + '月';
+  document.getElementById('e-month').value = (new Date().getMonth()+1) + '月';
 }
 function addEnglish() {
   const month = document.getElementById('e-month').value;
@@ -1486,8 +1080,7 @@ function saveWallet(key) {
   wallet[key] = { amount: v, ts: Date.now() };
   sd('wallet', wallet);
   document.getElementById('edit-' + key).classList.remove('open');
-  toast('Saved!');
-  renderWallet();
+  toast('Saved!'); renderWallet();
 }
 function renderWallet() {
   const wallet  = gd('wallet') || {};
@@ -1499,8 +1092,8 @@ function renderWallet() {
   const ufjAmt   = ufj   != null ? ufj.amount   : null;
   const yuchoAmt = yucho != null ? yucho.amount : null;
   const cashAmt  = cash  != null ? cash.amount  : null;
-  document.getElementById('w-ufj-val').textContent   = ufjAmt   != null ? yen(ufjAmt)   : '—';
-  document.getElementById('w-ufj-date').textContent  = fmtDate(ufj   ? ufj.ts   : null);
+  document.getElementById('w-ufj-val').textContent    = ufjAmt   != null ? yen(ufjAmt)   : '—';
+  document.getElementById('w-ufj-date').textContent   = fmtDate(ufj   ? ufj.ts   : null);
   document.getElementById('w-yucho-val').textContent  = yuchoAmt != null ? yen(yuchoAmt) : '—';
   document.getElementById('w-yucho-date').textContent = fmtDate(yucho ? yucho.ts : null);
   document.getElementById('w-cash-val').textContent   = cashAmt  != null ? yen(cashAmt)  : '—';
@@ -1509,7 +1102,7 @@ function renderWallet() {
   const grand = (ufjAmt || 0) + (yuchoAmt || 0) + (cashAmt || 0) + engTotal;
   document.getElementById('w-grand-val').textContent = yen(grand);
   const parts = [];
-  if (ufjAmt  == null) parts.push('UFJ');
+  if (ufjAmt   == null) parts.push('UFJ');
   if (yuchoAmt == null) parts.push('ゆうちょ');
   if (cashAmt  == null) parts.push('現金');
   document.getElementById('w-grand-sub').textContent = parts.length
@@ -1520,11 +1113,7 @@ function renderWallet() {
 /* ── SALARY ── */
 function getSalDefaults() {
   const d = gd('salDefaults') || {};
-  return {
-    rent:    d.rent    != null ? d.rent    : 84000,
-    car:     d.car     != null ? d.car     : 40480,
-    wallets: d.wallets != null ? d.wallets : 70000,
-  };
+  return { rent: d.rent != null ? d.rent : 84000, car: d.car != null ? d.car : 40480, wallets: d.wallets != null ? d.wallets : 70000 };
 }
 function saveDefaults() {
   const rent    = parseFloat(document.getElementById('def-rent').value);
@@ -1642,25 +1231,27 @@ function renderSalary() {
 
 /* ── INIT ── */
 window._appReady = function() {
-  // Sync desktop user display
   const av = document.getElementById('user-avatar');
   const nm = document.getElementById('user-name');
   if (av) {
     document.getElementById('user-avatar-desk').textContent = av.textContent;
     document.getElementById('user-name-desk').textContent   = nm.textContent;
   }
-
   if (localStorage.getItem('theme') === 'dark') {
-    dark = true;
-    applyTheme();
-    setThemeButtons();
+    dark = true; applyTheme(); setThemeButtons();
   }
-
   const todayM = (new Date().getMonth() + 1) + '月';
   const ams = getMonths();
   const ti = ams.indexOf(todayM);
   curMonth = ti >= 0 ? ti : Math.max(0, ams.length - 1);
   renderHome();
+
+  // Swipe listeners registered ONCE here — never inside render functions
+  addSwipe(
+    document.getElementById('page-months'),
+    () => chMonth(1),    // swipe left  → next month
+    () => chMonth(-1)    // swipe right → previous month
+  );
 };
 </script>
 </body>
