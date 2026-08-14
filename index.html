@@ -29,7 +29,7 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db    = getFirestore(fbApp);
 
-// Fixed owner key — acts as your private user ID (no login needed)
+// Load owner key from private config (default fallback if config fails to load)
 const OWNER_KEY  = window.baitoConfig ? window.baitoConfig.ownerKey : 'squipan-baito-owner';
 const SYNC_KEYS  = ['shifts','actuals','english','gas','salary','salDefaults','wallet'];
 
@@ -154,6 +154,7 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
           <div style="font-size:13px;color:var(--text2);font-weight:500">My Income</div>
           <div style="display:flex;gap:6px;align-items:center">
             <button class="tbtn" id="tbtn-mob" onclick="toggleTheme()"><i class="ti ti-moon"></i> Dark</button>
+            <button class="tbtn" onclick="document.getElementById('recovery-overlay').style.display='flex'" style="padding:6px 10px" title="Data recovery"><i class="ti ti-database-import"></i></button>
           </div>
         </div>
         <div class="card">
@@ -411,6 +412,31 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
     <button class="nb" onclick="goPage('gas')"><i class="ti ti-gas-station"></i><span>Gas</span></button>
     <button class="nb" onclick="goPage('wallet')"><i class="ti ti-wallet"></i><span>Wallet</span></button>
     <button class="nb" onclick="goPage('salary')"><i class="ti ti-briefcase"></i><span>Job</span></button>
+  </div>
+
+  <!-- Data Recovery Modal -->
+  <div id="recovery-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px">
+    <div style="background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:15px;font-weight:600;color:var(--text)">📦 Data Recovery</div>
+        <button onclick="document.getElementById('recovery-overlay').style.display='none'" style="background:none;border:none;font-size:22px;color:var(--text3);cursor:pointer">×</button>
+      </div>
+
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+        <b>On your phone:</b> tap <i>Export</i> → copy all the text.<br>
+        <b>On your PC:</b> paste it below → tap <i>Import</i>.
+      </div>
+
+      <button onclick="exportData()" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:10px;font-family:var(--font)">
+        <i class="ti ti-download"></i> Export data from THIS device
+      </button>
+
+      <textarea id="recovery-json" placeholder="Paste exported JSON here to import..." style="width:100%;height:140px;background:var(--bg);border:0.5px solid var(--border2);border-radius:8px;padding:10px;font-size:11px;color:var(--text);font-family:monospace;resize:vertical;outline:none;margin-bottom:10px"></textarea>
+
+      <button onclick="importData()" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)">
+        <i class="ti ti-upload"></i> Import &amp; sync to cloud
+      </button>
+    </div>
   </div>
 </div>
 

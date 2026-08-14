@@ -544,12 +544,6 @@ function renderSalary() {
 
 /* ── INIT ── */
 window._appReady = function() {
-  const av = document.getElementById('user-avatar');
-  const nm = document.getElementById('user-name');
-  if (av) {
-    document.getElementById('user-avatar-desk').textContent = av.textContent;
-    document.getElementById('user-name-desk').textContent   = nm.textContent;
-  }
   if (localStorage.getItem('theme') === 'dark') {
     dark = true; applyTheme(); setThemeButtons();
   }
@@ -566,3 +560,39 @@ window._appReady = function() {
     () => chMonth(-1)   // swipe right → previous month
   );
 };
+
+/* ── DATA RECOVERY ── */
+const SYNC_KEYS_ALL = ['shifts','actuals','english','gas','salary','salDefaults','wallet'];
+
+function exportData() {
+  const out = {};
+  SYNC_KEYS_ALL.forEach(k => {
+    const raw = localStorage.getItem(k);
+    if (raw) out[k] = JSON.parse(raw);
+  });
+  const json = JSON.stringify(out, null, 2);
+  const ta = document.getElementById('recovery-json');
+  ta.value = json;
+  ta.select();
+  try { navigator.clipboard.writeText(json).then(() => alert('Copied to clipboard! ✓')); }
+  catch(e) { alert('Select all text in the box and copy manually.'); }
+}
+
+async function importData() {
+  const raw = document.getElementById('recovery-json').value.trim();
+  if (!raw) { alert('Paste exported JSON first.'); return; }
+  let data;
+  try { data = JSON.parse(raw); }
+  catch(e) { alert('Invalid JSON — make sure you copied the full export text.'); return; }
+
+  let count = 0;
+  for (const key of SYNC_KEYS_ALL) {
+    if (data[key] !== undefined) {
+      sd(key, data[key]); // saves to localStorage + fires fbSave to Firestore
+      count++;
+    }
+  }
+  alert(`Imported ${count} data keys! Reloading...`);
+  location.reload();
+}
+
