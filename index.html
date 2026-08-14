@@ -112,6 +112,7 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -128,6 +129,7 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
       <button class="snb" onclick="goPage('gas')" data-page="gas"><i class="ti ti-gas-station"></i> Gasoline</button>
       <button class="snb" onclick="goPage('wallet')" data-page="wallet"><i class="ti ti-wallet"></i> Wallet</button>
       <button class="snb" onclick="goPage('salary')" data-page="salary"><i class="ti ti-briefcase"></i> Main Job</button>
+      <button class="snb" onclick="goPage('graph')" data-page="graph"><i class="ti ti-chart-bar"></i> Graph</button>
     </div>
     <div class="sidebar-bottom">
       <div class="sidebar-user">
@@ -402,16 +404,49 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
         <div id="salary-list"></div>
       </div>
 
+      <!-- GRAPH -->
+      <div class="page" id="page-graph">
+        <div class="topbar">
+          <div class="pg-title">Graph</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+
+        <!-- Year totals -->
+        <div class="graph-year-total" id="graph-totals"></div>
+
+        <!-- Series toggles -->
+        <div class="graph-series-row">
+          <button id="btn-series-hamazushi" class="series-btn on g" onclick="toggleSeries('hamazushi')">
+            <span class="series-dot" style="background:var(--green)"></span> はま寿司
+          </button>
+          <button id="btn-series-mainjob" class="series-btn on b" onclick="toggleSeries('mainjob')">
+            <span class="series-dot" style="background:var(--blue)"></span> Main Job
+          </button>
+        </div>
+
+        <!-- Chart -->
+        <div class="card" style="padding:16px 12px">
+          <div id="graph-empty" class="empty" style="display:none">No data yet.<br>Add shifts and salary entries to see the graph.</div>
+          <div class="chart-scroll-wrap" id="graph-chart-wrap">
+            <div class="chart-inner" id="graph-chart-inner">
+              <canvas id="income-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <div class="bnav">
-    <button class="nb active" onclick="goPage('home')"><i class="ti ti-home"></i><span>Home</span></button>
-    <button class="nb" onclick="goPage('months')"><i class="ti ti-calendar"></i><span>Shifts</span></button>
-    <button class="nb" onclick="goPage('english')"><i class="ti ti-school"></i><span>English</span></button>
-    <button class="nb" onclick="goPage('gas')"><i class="ti ti-gas-station"></i><span>Gas</span></button>
-    <button class="nb" onclick="goPage('wallet')"><i class="ti ti-wallet"></i><span>Wallet</span></button>
-    <button class="nb" onclick="goPage('salary')"><i class="ti ti-briefcase"></i><span>Job</span></button>
+
+  <div class="bnav" style="grid-template-columns:repeat(7,1fr)">
+    <button class="nb active" onclick="goPage('home')"><i class="ti ti-home" style="font-size:20px"></i><span style="font-size:9px">Home</span></button>
+    <button class="nb" onclick="goPage('months')"><i class="ti ti-calendar" style="font-size:20px"></i><span style="font-size:9px">Shifts</span></button>
+    <button class="nb" onclick="goPage('english')"><i class="ti ti-school" style="font-size:20px"></i><span style="font-size:9px">English</span></button>
+    <button class="nb" onclick="goPage('gas')"><i class="ti ti-gas-station" style="font-size:20px"></i><span style="font-size:9px">Gas</span></button>
+    <button class="nb" onclick="goPage('wallet')"><i class="ti ti-wallet" style="font-size:20px"></i><span style="font-size:9px">Wallet</span></button>
+    <button class="nb" onclick="goPage('salary')"><i class="ti ti-briefcase" style="font-size:20px"></i><span style="font-size:9px">Job</span></button>
+    <button class="nb" onclick="goPage('graph')"><i class="ti ti-chart-bar" style="font-size:20px"></i><span style="font-size:9px">Graph</span></button>
   </div>
 
   <!-- Data Recovery Modal -->

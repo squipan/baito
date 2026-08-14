@@ -23,7 +23,7 @@ const DAYS   = ['日','月','火','水','木','金','土'];
 const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 const DAY_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MON_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const PAGE_TITLES = { home:'Home', months:'はま寿司', english:'English', gas:'Gasoline', wallet:'Wallet', salary:'Main Job' };
+const PAGE_TITLES = { home:'Home', months:'はま寿司', english:'English', gas:'Gasoline', wallet:'Wallet', salary:'Main Job', graph:'Graph' };
 
 let dark = false, curMonth = 0;
 
@@ -116,7 +116,7 @@ function goPage(name) {
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.snb').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  ['home','months','english','gas','wallet','salary'].forEach((n,i) => {
+  ['home','months','english','gas','wallet','salary','graph'].forEach((n,i) => {
     if (n === name) document.querySelectorAll('.nb')[i].classList.add('active');
   });
   const snb = document.querySelector(`.snb[data-page="${name}"]`);
@@ -129,6 +129,7 @@ function goPage(name) {
   else if (name === 'english') renderEnglish();
   else if (name === 'gas') renderGas();
   else if (name === 'salary') renderSalary();
+  else if (name === 'graph') renderGraph();
   else renderWallet();
 }
 
@@ -595,4 +596,144 @@ async function importData() {
   alert(`Imported ${count} data keys! Reloading...`);
   location.reload();
 }
+
+/* ── GRAPH ── */
+let _graphChart = null;
+let _graphShow = { hamazushi: true, mainjob: true };
+
+function renderGraph() {
+  const actuals = gd('actuals') || {};
+  const salary  = gd('salary')  || [];
+
+  // Build unified sorted key list
+  const keySet = new Set();
+  Object.keys(actuals).forEach(k => keySet.add(k));
+  salary.forEach(s => keySet.add(s.year + '-' + s.month));
+
+  const sortedKeys = [...keySet].sort((a, b) => {
+    const [ay, am] = a.split('-');
+    const [by, bm] = b.split('-');
+    if (ay !== by) return ay.localeCompare(by);
+    return MONTHS.indexOf(am) - MONTHS.indexOf(bm);
+  });
+
+  const emptyEl = document.getElementById('graph-empty');
+  const wrapEl  = document.getElementById('graph-chart-wrap');
+
+  if (!sortedKeys.length) {
+    emptyEl.style.display = 'block';
+    wrapEl.style.display  = 'none';
+    document.getElementById('graph-totals').innerHTML = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  wrapEl.style.display  = 'block';
+
+  // Labels — short format e.g. "1月'25"
+  const labels = sortedKeys.map(k => {
+    const [y, m] = k.split('-');
+    return m + "'" + y.slice(2);
+  });
+
+  const hamazushiData = sortedKeys.map(k => actuals[k] || 0);
+  const salaryData    = sortedKeys.map(k => {
+    const [y, m] = k.split('-');
+    const e = salary.find(s => s.year === y && s.month === m);
+    return e ? (e.base + (e.bonus || 0)) : 0;
+  });
+
+  // Year totals summary
+  const yr = new Date().getFullYear().toString();
+  const yrH = sortedKeys.filter(k => k.startsWith(yr)).reduce((s, k) => s + (actuals[k] || 0), 0);
+  const yrS = salary.filter(s => s.year === yr).reduce((s, x) => s + x.base + (x.bonus || 0), 0);
+  document.getElementById('graph-totals').innerHTML = `
+    <div class="gyt"><div class="gyt-lbl">はま寿司 ${yr}</div><div class="gyt-val g">${yen(yrH)}</div></div>
+    <div class="gyt"><div class="gyt-lbl">Main Job ${yr}</div><div class="gyt-val b">${yen(yrS)}</div></div>
+    <div class="gyt"><div class="gyt-lbl">Combined ${yr}</div><div class="gyt-val p">${yen(yrH + yrS)}</div></div>
+  `;
+
+  // Chart sizing — min width so it scrolls on mobile with many months
+  const inner = document.getElementById('graph-chart-inner');
+  const minW  = Math.max(sortedKeys.length * 52, inner.parentElement.offsetWidth || 320);
+  inner.style.width = minW + 'px';
+
+  const canvas = document.getElementById('income-chart');
+  const ctx    = canvas.getContext('2d');
+
+  // Gradients
+  const isDark = dark;
+  const greenTop  = isDark ? 'rgba(0,229,160,0.85)'   : 'rgba(29,158,117,0.85)';
+  const greenBot  = isDark ? 'rgba(0,229,160,0.25)'   : 'rgba(29,158,117,0.25)';
+  const blueTop   = isDark ? 'rgba(88,166,255,0.85)'  : 'rgba(26,111,181,0.85)';
+  const blueBot   = isDark ? 'rgba(88,166,255,0.25)'  : 'rgba(26,111,181,0.25)';
+  const chartH    = 240;
+  const gGreen = ctx.createLinearGradient(0, 0, 0, chartH);
+  gGreen.addColorStop(0, greenTop); gGreen.addColorStop(1, greenBot);
+  const gBlue  = ctx.createLinearGradient(0, 0, 0, chartH);
+  gBlue.addColorStop(0, blueTop);  gBlue.addColorStop(1, blueBot);
+
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const tickColor = isDark ? '#484f58' : '#aaaaaa';
+
+  // Destroy old chart
+  if (_graphChart) { _graphChart.destroy(); _graphChart = null; }
+
+  const datasets = [];
+  if (_graphShow.hamazushi) datasets.push({
+    label: 'はま寿司', data: hamazushiData,
+    backgroundColor: gGreen, borderRadius: 5, borderSkipped: false,
+  });
+  if (_graphShow.mainjob) datasets.push({
+    label: 'Main Job', data: salaryData,
+    backgroundColor: gBlue, borderRadius: 5, borderSkipped: false,
+  });
+
+  _graphChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      animation: { duration: 400, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? '#161b27' : '#ffffff',
+          titleColor:  isDark ? '#e6edf3' : '#111111',
+          bodyColor:   isDark ? '#8b949e'  : '#666666',
+          borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.09)',
+          borderWidth: 1, padding: 10, cornerRadius: 8,
+          callbacks: { label: c => '  ' + c.dataset.label + ': ' + yen(c.raw) }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: gridColor },
+          ticks: { color: tickColor, font: { size: 10, family: "'Outfit',sans-serif" }, maxRotation: 0 }
+        },
+        y: {
+          grid: { color: gridColor },
+          ticks: {
+            color: tickColor, font: { size: 10, family: "'Outfit',sans-serif" },
+            callback: v => v >= 1000 ? '¥' + (v/1000).toFixed(0) + 'k' : '¥' + v
+          }
+        }
+      }
+    }
+  });
+
+  // Fix canvas height
+  canvas.style.height = chartH + 'px';
+  canvas.style.width  = '100%';
+}
+
+function toggleSeries(type) {
+  _graphShow[type] = !_graphShow[type];
+  const btn = document.getElementById('btn-series-' + type);
+  const isOn = _graphShow[type];
+  const colorClass = type === 'hamazushi' ? 'g' : 'b';
+  btn.className = 'series-btn' + (isOn ? ' on ' + colorClass : '');
+  renderGraph();
+}
+
 
