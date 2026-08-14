@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1D9E75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Income">
+<meta name="description" content="Track shifts, English lessons and gas expenses">
+<title>My Income</title>
+
+<!-- Firebase (must stay inline as ES module) -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCC8Ea0onJWeAj9YVzQhI1-loG3cEVhabo",
+  authDomain: "baito-cad47.firebaseapp.com",
+  projectId: "baito-cad47",
+  storageBucket: "baito-cad47.firebasestorage.app",
+  messagingSenderId: "927251861039",
+  appId: "1:927251861039:web:139ec8c7b05e28bdc300da"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getFirestore(fbApp);
+
+// Fixed owner key — acts as your private user ID (no login needed)
+const OWNER_KEY  = 'squipan-baito-owner';
+const SYNC_KEYS  = ['shifts','actuals','english','gas','salary','salDefaults','wallet'];
+
+window.fbSave = async function(key, value) {
+  try {
+    await setDoc(doc(db, 'users', OWNER_KEY, 'data', key), { value: JSON.stringify(value) });
+  } catch(e) { console.warn('Firebase save failed', e); }
+};
+
+window.fbLoadAll = async function() {
+  try {
+    for (const key of SYNC_KEYS) {
+      const snap = await getDoc(doc(db, 'users', OWNER_KEY, 'data', key));
+      if (snap.exists()) localStorage.setItem(key, snap.data().value);
+    }
+  } catch(e) { console.warn('Firebase load failed', e); }
+};
+
+// Auto-start: load from Firestore then init app
+window.fbLoadAll().then(() => window._appReady());
+</script>
+
+<!-- PWA Manifest (inline blob — no separate manifest.json needed) -->
+<script>
+const manifestData = {
+  name: "My Income Tracker",
+  short_name: "My Income",
+  description: "Track shifts, English lessons and gas",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#ffffff",
+  theme_color: "#1D9E75",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%231D9E75'/><rect x='28' y='58' width='136' height='88' rx='12' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='2'/><rect x='28' y='80' width='136' height='3' fill='rgba(255,255,255,0.35)'/><circle cx='62' cy='103' r='13' fill='white' opacity='0.9'/><circle cx='86' cy='103' r='13' fill='white' opacity='0.5'/><rect x='104' y='95' width='44' height='8' rx='4' fill='rgba(255,255,255,0.45)'/><rect x='104' y='109' width='30' height='6' rx='3' fill='rgba(255,255,255,0.3)'/><text x='96' y='168' font-size='16' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='2'>収入</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231D9E75'/><rect x='74' y='152' width='364' height='234' rx='32' fill='rgba(255,255,255,0.18)' stroke='rgba(255,255,255,0.4)' stroke-width='5'/><rect x='74' y='212' width='364' height='8' fill='rgba(255,255,255,0.35)'/><circle cx='166' cy='270' r='36' fill='white' opacity='0.9'/><circle cx='230' cy='270' r='36' fill='white' opacity='0.5'/><rect x='276' y='248' width='118' height='22' rx='11' fill='rgba(255,255,255,0.45)'/><rect x='276' y='280' width='80' height='16' rx='8' fill='rgba(255,255,255,0.3)'/><text x='256' y='448' font-size='44' font-family='system-ui' font-weight='700' fill='white' opacity='0.9' text-anchor='middle' letter-spacing='4'>収入</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
+<!-- Apple touch icon (canvas-generated) -->
+<script>
+(function(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 180;
+  const ctx = c.getContext('2d');
+  const r = 38;
+  ctx.beginPath();
+  ctx.moveTo(r,0); ctx.lineTo(180-r,0); ctx.quadraticCurveTo(180,0,180,r);
+  ctx.lineTo(180,180-r); ctx.quadraticCurveTo(180,180,180-r,180);
+  ctx.lineTo(r,180); ctx.quadraticCurveTo(0,180,0,180-r);
+  ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0); ctx.closePath();
+  ctx.fillStyle = '#1D9E75'; ctx.fill();
+  ctx.beginPath(); roundRect(ctx,22,52,136,84,12);
+  ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.38)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.32)'; ctx.fillRect(22,74,136,7);
+  ctx.beginPath(); ctx.arc(56,98,13,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(78,98,13,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.42)'; ctx.beginPath(); roundRect(ctx,100,90,44,8,4); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.28)'; ctx.beginPath(); roundRect(ctx,100,104,30,6,3); ctx.fill();
+  ctx.font='700 17px system-ui,-apple-system,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.88)';
+  ctx.textAlign='center'; ctx.fillText('収入',90,158);
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  }
+  const link = document.createElement('link');
+  link.rel='apple-touch-icon'; link.href=c.toDataURL('image/png');
+  document.head.appendChild(link);
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">💴</div>
+      <div class="sidebar-logo-text">My Income</div>
+    </div>
+    <div class="sidebar-nav">
+      <button class="snb active" onclick="goPage('home')" data-page="home"><i class="ti ti-home"></i> Home</button>
+      <button class="snb" onclick="goPage('months')" data-page="months"><i class="ti ti-calendar"></i> はま寿司</button>
+      <button class="snb" onclick="goPage('english')" data-page="english"><i class="ti ti-school"></i> English</button>
+      <button class="snb" onclick="goPage('gas')" data-page="gas"><i class="ti ti-gas-station"></i> Gasoline</button>
+      <button class="snb" onclick="goPage('wallet')" data-page="wallet"><i class="ti ti-wallet"></i> Wallet</button>
+      <button class="snb" onclick="goPage('salary')" data-page="salary"><i class="ti ti-briefcase"></i> Main Job</button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="s-actions">
+          <button class="s-btn" id="theme-btn-desk" onclick="toggleTheme()" title="Toggle theme"><i class="ti ti-moon"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div id="main-area">
+    <div id="desktop-topbar">
+      <div class="dt-title" id="dt-page-title">Home</div>
+      <div class="dt-actions">
+        <button class="tbtn" id="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i> Dark</button>
+      </div>
+    </div>
+
+    <div class="scroll-area" id="scroll">
+
+      <!-- HOME -->
+      <div class="page active" id="page-home">
+        <div class="topbar">
+          <div style="font-size:13px;color:var(--text2);font-weight:500">My Income</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="tbtn" id="tbtn-mob" onclick="toggleTheme()"><i class="ti ti-moon"></i> Dark</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="hero-date" id="h-date"></div>
+          <div class="hero-weekday" id="h-weekday"></div>
+          <hr class="hero-divider">
+          <div class="income-grid" id="h-income"></div>
+        </div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-clock"></i> Log a shift</div>
+          <div class="frow">
+            <div class="f"><label>Date</label><input type="date" id="ql-date" oninput="qlDate()"></div>
+            <div class="f"><label>Day</label><input id="ql-day" readonly placeholder="Auto"></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Time in</label><input type="time" id="ql-in" value="21:00" oninput="qlCalc()"></div>
+            <div class="f"><label>Time out</label><input type="time" id="ql-out" value="00:00" oninput="qlCalc()"></div>
+          </div>
+          <div class="preview-pill" id="ql-prev">
+            <div><div class="pp-lbl">This shift</div><div class="pp-val" id="ql-pval">—</div></div>
+            <div><div class="pp-lbl">Hours</div><div class="pp-val" id="ql-phrs">—</div></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="f"><label>Month</label>
+              <select id="ql-month">
+                <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+                <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+                <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+              </select>
+            </div>
+            <div class="f"><label>Status</label>
+              <select id="ql-done"><option value="1">Done ✓</option><option value="0">Upcoming</option></select>
+            </div>
+          </div>
+          <button class="btn-add" onclick="qlSubmit()"><i class="ti ti-plus"></i> Add shift</button>
+        </div>
+        <div class="toast-wrap"><span class="toast" id="toast"></span></div>
+      </div>
+
+      <!-- MONTHS -->
+      <div class="page" id="page-months">
+        <div class="topbar">
+          <div class="pg-title">はま寿司</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="month-nav">
+          <div class="m-title" id="m-title">—</div>
+          <div class="arrows">
+            <button class="arr" id="arr-p" onclick="chMonth(-1)">‹</button>
+            <button class="arr" id="arr-n" onclick="chMonth(1)">›</button>
+          </div>
+        </div>
+        <div class="stat3" id="m-stats"></div>
+        <div class="card" id="m-actual"></div>
+        <div class="sec-hd">Shifts</div>
+        <table class="shift-tbl">
+          <colgroup>
+            <col style="width:29%"><col style="width:28%">
+            <col style="width:15%"><col style="width:21%"><col style="width:7%">
+          </colgroup>
+          <thead><tr>
+            <th>Date</th><th>In → Out</th>
+            <th class="r">Hrs</th><th class="r">予想給料</th><th></th>
+          </tr></thead>
+          <tbody id="m-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- ENGLISH -->
+      <div class="page" id="page-english">
+        <div class="topbar">
+          <div class="pg-title">English</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-plus"></i> Add payment</div>
+          <div class="frow">
+            <div class="f"><label>Month</label>
+              <select id="e-month">
+                <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+                <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+                <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+              </select>
+            </div>
+            <div class="f"><label>Amount (¥)</label><input type="number" id="e-amt" placeholder="19080"></div>
+          </div>
+          <div class="f" style="margin-bottom:10px">
+            <label>Note (optional)</label>
+            <input type="text" id="e-note" placeholder="e.g. enrollment fee">
+          </div>
+          <button class="btn-add" onclick="addEnglish()">Add payment</button>
+        </div>
+        <div id="english-list"></div>
+      </div>
+
+      <!-- GAS -->
+      <div class="page" id="page-gas">
+        <div class="topbar">
+          <div class="pg-title">Gasoline</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div id="gas-banner"></div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-plus"></i> Log refuel</div>
+          <div class="frow">
+            <div class="f"><label>Date</label><input type="date" id="g-date"></div>
+            <div class="f"><label>Cost (¥)</label><input type="number" id="g-cost" placeholder="3500"></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="f"><label>Odometer (km)</label><input type="number" id="g-odo" placeholder="12500"></div>
+            <div class="f"><label>Note</label><input type="text" id="g-note" placeholder="optional"></div>
+          </div>
+          <button class="btn-add" onclick="addGas()">Add refuel</button>
+        </div>
+        <div id="gas-list"></div>
+      </div>
+
+      <!-- WALLET -->
+      <div class="page" id="page-wallet">
+        <div class="topbar">
+          <div class="pg-title">Wallet</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="wallet-grand" id="w-grand">
+          <div class="wg-lbl">Grand total</div>
+          <div class="wg-val" id="w-grand-val">¥0</div>
+          <div class="wg-updated" id="w-grand-sub"></div>
+        </div>
+        <div class="wallet-accounts">
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon ufj"><i class="ti ti-building-bank"></i></div>
+                <div><div class="wacc-name">UFJ</div><div class="wacc-updated" id="w-ufj-date">—</div></div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt ufj" id="w-ufj-val">—</div>
+                <button class="wacc-edit" onclick="toggleEdit('ufj')"><i class="ti ti-pencil"></i></button>
+              </div>
+            </div>
+            <div class="wallet-edit-form" id="edit-ufj">
+              <div class="we-lbl">Current UFJ balance (¥)</div>
+              <div class="we-row"><input type="number" id="inp-ufj" placeholder="e.g. 45000"><button onclick="saveWallet('ufj')">Save</button></div>
+            </div>
+          </div>
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon yucho"><i class="ti ti-coin"></i></div>
+                <div><div class="wacc-name">ゆうちょ</div><div class="wacc-updated" id="w-yucho-date">—</div></div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt yucho" id="w-yucho-val">—</div>
+                <button class="wacc-edit" onclick="toggleEdit('yucho')"><i class="ti ti-pencil"></i></button>
+              </div>
+            </div>
+            <div class="wallet-edit-form" id="edit-yucho">
+              <div class="we-lbl">Current ゆうちょ balance (¥)</div>
+              <div class="we-row"><input type="number" id="inp-yucho" placeholder="e.g. 20000"><button onclick="saveWallet('yucho')">Save</button></div>
+            </div>
+          </div>
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon english"><i class="ti ti-school"></i></div>
+                <div><div class="wacc-name">English lessons</div><div class="wacc-updated" id="w-english-date">All time total</div></div>
+              </div>
+              <div class="wacc-right"><div class="wacc-amt english" id="w-english-val">¥0</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="wacc">
+              <div class="wacc-left">
+                <div class="wacc-icon" style="background:var(--green-bg);color:var(--green)"><i class="ti ti-cash"></i></div>
+                <div><div class="wacc-name">現金 / Cash</div><div class="wacc-updated" id="w-cash-date">—</div></div>
+              </div>
+              <div class="wacc-right">
+                <div class="wacc-amt" style="color:var(--green)" id="w-cash-val">—</div>
+                <button class="wacc-edit" onclick="toggleEdit('cash')"><i class="ti ti-pencil"></i></button>
+              </div>
+            </div>
+            <div class="wallet-edit-form" id="edit-cash">
+              <div class="we-lbl">Current cash on hand (¥)</div>
+              <div class="we-row"><input type="number" id="inp-cash" placeholder="e.g. 15000"><button onclick="saveWallet('cash')">Save</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="wallet-note" id="w-note">Tap the pencil icon to update your bank balances.<br>English total is pulled live from the English tab.</div>
+      </div>
+
+      <!-- SALARY -->
+      <div class="page" id="page-salary">
+        <div class="topbar">
+          <div class="pg-title">Main Job</div>
+          <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
+        </div>
+        <div class="card2" id="sal-defaults-card">
+          <div class="card-label" style="justify-content:space-between;cursor:pointer" onclick="toggleSalDefaults()">
+            <span><i class="ti ti-settings"></i> Default deductions</span>
+            <i class="ti ti-chevron-down" id="sal-def-chevron"></i>
+          </div>
+          <div id="sal-defaults-body" style="display:none">
+            <div class="frow">
+              <div class="f"><label>Rent (¥)</label><input type="number" id="def-rent" placeholder="84000" oninput="saveDefaults()"></div>
+              <div class="f"><label>Car loan (¥)</label><input type="number" id="def-car" placeholder="40480" oninput="saveDefaults()"></div>
+            </div>
+            <div class="frow" style="margin-bottom:4px">
+              <div class="f"><label>Our wallets (¥)</label><input type="number" id="def-wallets" placeholder="70000" oninput="saveDefaults()"></div>
+              <div class="f"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:4px">Changes apply to new entries only</div>
+          </div>
+        </div>
+        <div id="salary-year-banner"></div>
+        <div class="card2">
+          <div class="card-label"><i class="ti ti-plus"></i> Log this month</div>
+          <div class="frow">
+            <div class="f"><label>Month</label>
+              <select id="sal-month">
+                <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+                <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+                <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+              </select>
+            </div>
+            <div class="f"><label>Year</label><select id="sal-year"></select></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Salary after tax (¥)</label><input type="number" id="sal-base"></div>
+            <div class="f"><label>Bonus (¥)</label><input type="number" id="sal-bonus" placeholder="0"></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Rent (¥)</label><input type="number" id="sal-rent" placeholder="84000"></div>
+            <div class="f"><label>Car loan (¥)</label><input type="number" id="sal-car" placeholder="40480"></div>
+          </div>
+          <div class="frow">
+            <div class="f"><label>Our wallets (¥)</label><input type="number" id="sal-wallets" placeholder="70000"></div>
+            <div class="f"><label>Credit card (¥)</label><input type="number" id="sal-cc" placeholder="0"></div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="f"><label>Note</label><input type="text" id="sal-note" placeholder="optional"></div>
+            <div class="f"></div>
+          </div>
+          <button class="btn-add" onclick="addSalary()"><i class="ti ti-plus"></i> Save month</button>
+        </div>
+        <div id="salary-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bnav">
+    <button class="nb active" onclick="goPage('home')"><i class="ti ti-home"></i><span>Home</span></button>
+    <button class="nb" onclick="goPage('months')"><i class="ti ti-calendar"></i><span>Shifts</span></button>
+    <button class="nb" onclick="goPage('english')"><i class="ti ti-school"></i><span>English</span></button>
+    <button class="nb" onclick="goPage('gas')"><i class="ti ti-gas-station"></i><span>Gas</span></button>
+    <button class="nb" onclick="goPage('wallet')"><i class="ti ti-wallet"></i><span>Wallet</span></button>
+    <button class="nb" onclick="goPage('salary')"><i class="ti ti-briefcase"></i><span>Job</span></button>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
