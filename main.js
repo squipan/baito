@@ -598,142 +598,255 @@ async function importData() {
 }
 
 /* ── GRAPH ── */
-let _graphChart = null;
-let _graphShow = { hamazushi: true, mainjob: true };
+let _graphJob  = 'hama';
+let _graphYear = new Date().getFullYear();
+let _selBar    = null;
+let _barChart2 = null;
+let _lineChart2= null;
+
+// Custom plugin: draws dotted vertical line on selected bar
+const _dottedLinePlugin = {
+  id: 'dottedLine',
+  afterDatasetsDraw(chart) {
+    if (_selBar === null) return;
+    const meta = chart.getDatasetMeta(0);
+    const bar  = meta.data[_selBar];
+    if (!bar || bar.y >= chart.chartArea.bottom - 1) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(bar.x, bar.y);
+    ctx.lineTo(bar.x, chart.chartArea.top);
+    ctx.stroke();
+    ctx.restore();
+
+    // Position HTML tooltip above the bar
+    const canvas  = chart.canvas;
+    const cssX    = bar.x * (canvas.offsetWidth  / chart.width);
+    const tooltip = document.getElementById('graph-tooltip');
+    const tw      = tooltip.offsetWidth || 200;
+    const wrapW   = canvas.offsetWidth;
+    let left = cssX - tw / 2;
+    left = Math.max(4, Math.min(wrapW - tw - 4, left));
+    tooltip.style.left = left + 'px';
+    tooltip.style.transform = 'none';
+  }
+};
+
+function getGraphData(job, year) {
+  const yr = year.toString();
+  if (job === 'hama') {
+    const actuals = gd('actuals') || {};
+    return MONTHS.map(m => actuals[yr + '-' + m] || 0);
+  } else {
+    const salary = gd('salary') || [];
+    return MONTHS.map(m => {
+      const e = salary.find(s => s.year === yr && s.month === m);
+      return e ? (e.base + (e.bonus || 0)) : 0;
+    });
+  }
+}
 
 function renderGraph() {
-  const actuals = gd('actuals') || {};
-  const salary  = gd('salary')  || [];
+  const yr = _graphYear;
+  document.getElementById('graph-year-label').textContent = yr + '年';
 
-  // Build unified sorted key list
-  const keySet = new Set();
-  Object.keys(actuals).forEach(k => keySet.add(k));
-  salary.forEach(s => keySet.add(s.year + '-' + s.month));
+  // Disable next-year if already at current year
+  const curYr = new Date().getFullYear();
+  document.getElementById('gyn-next').disabled = yr >= curYr + 1;
+  document.getElementById('gyn-prev').disabled = yr <= 2022;
 
-  const sortedKeys = [...keySet].sort((a, b) => {
-    const [ay, am] = a.split('-');
-    const [by, bm] = b.split('-');
-    if (ay !== by) return ay.localeCompare(by);
-    return MONTHS.indexOf(am) - MONTHS.indexOf(bm);
+  _renderBarGraph();
+  _renderLineGraph();
+}
+
+function _renderBarGraph() {
+  const data12 = getGraphData(_graphJob, _graphYear);
+  const isHama = _graphJob === 'hama';
+  const isDk   = dark;
+
+  const activeColor   = isHama
+    ? (isDk ? 'rgba(0,229,160,0.95)'  : 'rgba(29,158,117,0.95)')
+    : (isDk ? 'rgba(88,166,255,0.95)' : 'rgba(26,111,181,0.95)');
+  const normalColor   = isHama
+    ? (isDk ? 'rgba(0,229,160,0.32)'  : 'rgba(29,158,117,0.28)')
+    : (isDk ? 'rgba(88,166,255,0.32)' : 'rgba(26,111,181,0.28)');
+  const emptyColor    = isDk ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const gridColor     = isDk ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const tickColor     = isDk ? '#484f58' : '#aaaaaa';
+
+  const bgColors = data12.map((v, i) => {
+    if (i === _selBar) return activeColor;
+    return v === 0 ? emptyColor : normalColor;
   });
 
-  const emptyEl = document.getElementById('graph-empty');
-  const wrapEl  = document.getElementById('graph-chart-wrap');
-
-  if (!sortedKeys.length) {
-    emptyEl.style.display = 'block';
-    wrapEl.style.display  = 'none';
-    document.getElementById('graph-totals').innerHTML = '';
-    return;
-  }
-  emptyEl.style.display = 'none';
-  wrapEl.style.display  = 'block';
-
-  // Labels — short format e.g. "1月'25"
-  const labels = sortedKeys.map(k => {
-    const [y, m] = k.split('-');
-    return m + "'" + y.slice(2);
-  });
-
-  const hamazushiData = sortedKeys.map(k => actuals[k] || 0);
-  const salaryData    = sortedKeys.map(k => {
-    const [y, m] = k.split('-');
-    const e = salary.find(s => s.year === y && s.month === m);
-    return e ? (e.base + (e.bonus || 0)) : 0;
-  });
-
-  // Year totals summary
-  const yr = new Date().getFullYear().toString();
-  const yrH = sortedKeys.filter(k => k.startsWith(yr)).reduce((s, k) => s + (actuals[k] || 0), 0);
-  const yrS = salary.filter(s => s.year === yr).reduce((s, x) => s + x.base + (x.bonus || 0), 0);
-  document.getElementById('graph-totals').innerHTML = `
-    <div class="gyt"><div class="gyt-lbl">はま寿司 ${yr}</div><div class="gyt-val g">${yen(yrH)}</div></div>
-    <div class="gyt"><div class="gyt-lbl">Main Job ${yr}</div><div class="gyt-val b">${yen(yrS)}</div></div>
-    <div class="gyt"><div class="gyt-lbl">Combined ${yr}</div><div class="gyt-val p">${yen(yrH + yrS)}</div></div>
-  `;
-
-  // Chart sizing — min width so it scrolls on mobile with many months
-  const inner = document.getElementById('graph-chart-inner');
-  const minW  = Math.max(sortedKeys.length * 52, inner.parentElement.offsetWidth || 320);
-  inner.style.width = minW + 'px';
-
-  const canvas = document.getElementById('income-chart');
+  const canvas = document.getElementById('bar-chart');
   const ctx    = canvas.getContext('2d');
+  if (_barChart2) { _barChart2.destroy(); _barChart2 = null; }
 
-  // Gradients
-  const isDark = dark;
-  const greenTop  = isDark ? 'rgba(0,229,160,0.85)'   : 'rgba(29,158,117,0.85)';
-  const greenBot  = isDark ? 'rgba(0,229,160,0.25)'   : 'rgba(29,158,117,0.25)';
-  const blueTop   = isDark ? 'rgba(88,166,255,0.85)'  : 'rgba(26,111,181,0.85)';
-  const blueBot   = isDark ? 'rgba(88,166,255,0.25)'  : 'rgba(26,111,181,0.25)';
-  const chartH    = 240;
-  const gGreen = ctx.createLinearGradient(0, 0, 0, chartH);
-  gGreen.addColorStop(0, greenTop); gGreen.addColorStop(1, greenBot);
-  const gBlue  = ctx.createLinearGradient(0, 0, 0, chartH);
-  gBlue.addColorStop(0, blueTop);  gBlue.addColorStop(1, blueBot);
-
-  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-  const tickColor = isDark ? '#484f58' : '#aaaaaa';
-
-  // Destroy old chart
-  if (_graphChart) { _graphChart.destroy(); _graphChart = null; }
-
-  const datasets = [];
-  if (_graphShow.hamazushi) datasets.push({
-    label: 'はま寿司', data: hamazushiData,
-    backgroundColor: gGreen, borderRadius: 5, borderSkipped: false,
-  });
-  if (_graphShow.mainjob) datasets.push({
-    label: 'Main Job', data: salaryData,
-    backgroundColor: gBlue, borderRadius: 5, borderSkipped: false,
-  });
-
-  _graphChart = new Chart(ctx, {
+  _barChart2 = new Chart(ctx, {
     type: 'bar',
-    data: { labels, datasets },
+    plugins: [_dottedLinePlugin],
+    data: {
+      labels: MONTHS,
+      datasets: [{
+        data: data12,
+        backgroundColor: bgColors,
+        borderRadius: { topLeft: 5, topRight: 5 },
+        borderSkipped: false,
+      }]
+    },
     options: {
-      responsive: false,
+      responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 400, easing: 'easeOutQuart' },
+      animation: { duration: 250 },
+      onClick(evt, elements) {
+        if (!elements.length) return;
+        const idx = elements[0].index;
+        _selBar = idx;
+        const amount = data12[idx];
+        document.getElementById('gt-month').textContent  = MONTHS[idx];
+        document.getElementById('gt-amount').textContent = yen(amount);
+        const pill = document.getElementById('graph-tooltip');
+        pill.style.display = amount > 0 ? 'flex' : 'none';
+        // Re-render to update colors + trigger plugin for position
+        _renderBarGraph();
+      },
       plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: isDark ? '#161b27' : '#ffffff',
-          titleColor:  isDark ? '#e6edf3' : '#111111',
-          bodyColor:   isDark ? '#8b949e'  : '#666666',
-          borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.09)',
-          borderWidth: 1, padding: 10, cornerRadius: 8,
-          callbacks: { label: c => '  ' + c.dataset.label + ': ' + yen(c.raw) }
-        }
+        legend:  { display: false },
+        tooltip: { enabled: false }
       },
       scales: {
         x: {
-          grid: { color: gridColor },
+          grid: { display: false },
           ticks: { color: tickColor, font: { size: 10, family: "'Outfit',sans-serif" }, maxRotation: 0 }
         },
         y: {
-          grid: { color: gridColor },
+          grid: { color: gridColor, lineWidth: 1 },
+          border: { dash: [4, 4], display: false },
           ticks: {
             color: tickColor, font: { size: 10, family: "'Outfit',sans-serif" },
-            callback: v => v >= 1000 ? '¥' + (v/1000).toFixed(0) + 'k' : '¥' + v
+            callback: v => v >= 10000 ? (v/10000).toFixed(0) + '万' : (v > 0 ? v : '')
           }
         }
       }
     }
   });
 
-  // Fix canvas height
-  canvas.style.height = chartH + 'px';
-  canvas.style.width  = '100%';
+  // Average
+  const valid = data12.filter(v => v > 0);
+  const avg   = valid.length ? Math.round(valid.reduce((s,v) => s+v, 0) / valid.length) : 0;
+  const filledMonths = MONTHS.filter((_, i) => data12[i] > 0);
+  const yr = _graphYear;
+  document.getElementById('graph-avg').innerHTML = avg
+    ? `平均 <span style="font-weight:600">${yen(avg)}</span><span class="gav-range">（${yr}年${filledMonths[0] || ''}〜${filledMonths[filledMonths.length-1] || ''}）</span>`
+    : '<span style="color:var(--text3);font-size:11px">No data for this year</span>';
 }
 
-function toggleSeries(type) {
-  _graphShow[type] = !_graphShow[type];
-  const btn = document.getElementById('btn-series-' + type);
-  const isOn = _graphShow[type];
-  const colorClass = type === 'hamazushi' ? 'g' : 'b';
-  btn.className = 'series-btn' + (isOn ? ' on ' + colorClass : '');
+function _renderLineGraph() {
+  const data12 = getGraphData(_graphJob, _graphYear);
+  const lineCard = document.getElementById('graph-line-card');
+  const hasData  = data12.some(v => v > 0);
+
+  if (!hasData) { lineCard.style.display = 'none'; return; }
+  lineCard.style.display = 'block';
+
+  // Build cumulative — only include months with data or months between first and last data point
+  let firstIdx = data12.findIndex(v => v > 0);
+  let lastIdx  = data12.reduce((acc, v, i) => v > 0 ? i : acc, firstIdx);
+  const sliced = data12.slice(firstIdx, lastIdx + 1);
+  const cumulLabels = MONTHS.slice(firstIdx, lastIdx + 1);
+  let running = 0;
+  const cumulative = sliced.map(v => { running += v; return running; });
+
+  const isHama  = _graphJob === 'hama';
+  const isDk    = dark;
+  const lineClr = isHama
+    ? (isDk ? '#00e5a0' : '#1D9E75')
+    : (isDk ? '#58a6ff' : '#1a6fb5');
+  const gridColor = isDk ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const tickColor = isDk ? '#484f58' : '#aaaaaa';
+
+  const canvas = document.getElementById('line-chart');
+  const ctx    = canvas.getContext('2d');
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, 150);
+  grad.addColorStop(0, lineClr + '55');
+  grad.addColorStop(1, lineClr + '00');
+
+  if (_lineChart2) { _lineChart2.destroy(); _lineChart2 = null; }
+
+  _lineChart2 = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: cumulLabels,
+      datasets: [{
+        data: cumulative,
+        borderColor: lineClr,
+        borderWidth: 2.5,
+        fill: true,
+        backgroundColor: grad,
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: lineClr,
+        pointBorderColor: isDk ? '#161b27' : '#ffffff',
+        pointBorderWidth: 2.5,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 400, easing: 'easeOutQuart' },
+      plugins: {
+        legend:  { display: false },
+        tooltip: {
+          backgroundColor: isDk ? '#161b27' : '#ffffff',
+          titleColor:  isDk ? '#e6edf3' : '#111',
+          bodyColor:   isDk ? '#8b949e'  : '#666',
+          borderColor: lineClr,
+          borderWidth: 1, padding: 10, cornerRadius: 8,
+          callbacks: { label: c => '  累計: ' + yen(c.raw) }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: tickColor, font: { size: 10, family: "'Outfit',sans-serif" } }
+        },
+        y: {
+          grid: { color: gridColor },
+          border: { dash: [4, 4], display: false },
+          ticks: {
+            color: tickColor, font: { size: 10, family: "'Outfit',sans-serif" },
+            callback: v => v >= 10000 ? (v/10000).toFixed(0) + '万' : v
+          }
+        }
+      }
+    }
+  });
+}
+
+function switchGraphJob(job) {
+  _graphJob = job;
+  _selBar   = null;
+  document.getElementById('graph-tooltip').style.display = 'none';
+  document.getElementById('gjt-hama').className = 'gjt' + (job === 'hama' ? ' active g' : '');
+  document.getElementById('gjt-main').className = 'gjt' + (job === 'main' ? ' active b' : '');
   renderGraph();
 }
+
+function chGraphYear(dir) {
+  _graphYear += dir;
+  _selBar = null;
+  document.getElementById('graph-tooltip').style.display = 'none';
+  renderGraph();
+}
+
+
 
 

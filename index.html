@@ -411,32 +411,46 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
           <button class="tbtn" onclick="toggleTheme()"><i class="ti ti-moon"></i></button>
         </div>
 
-        <!-- Year totals -->
-        <div class="graph-year-total" id="graph-totals"></div>
-
-        <!-- Series toggles -->
-        <div class="graph-series-row">
-          <button id="btn-series-hamazushi" class="series-btn on g" onclick="toggleSeries('hamazushi')">
-            <span class="series-dot" style="background:var(--green)"></span> はま寿司
-          </button>
-          <button id="btn-series-mainjob" class="series-btn on b" onclick="toggleSeries('mainjob')">
-            <span class="series-dot" style="background:var(--blue)"></span> Main Job
-          </button>
+        <!-- Job tab switcher -->
+        <div class="graph-job-tabs">
+          <button class="gjt active g" id="gjt-hama" onclick="switchGraphJob('hama')">はま寿司</button>
+          <button class="gjt" id="gjt-main" onclick="switchGraphJob('main')">Main Job</button>
         </div>
 
-        <!-- Chart -->
-        <div class="card" style="padding:16px 12px">
-          <div id="graph-empty" class="empty" style="display:none">No data yet.<br>Add shifts and salary entries to see the graph.</div>
-          <div class="chart-scroll-wrap" id="graph-chart-wrap">
-            <div class="chart-inner" id="graph-chart-inner">
-              <canvas id="income-chart"></canvas>
-            </div>
+        <!-- Year nav -->
+        <div class="graph-year-nav">
+          <button class="gyn-btn" id="gyn-prev" onclick="chGraphYear(-1)"><i class="ti ti-chevron-left"></i> 前の年</button>
+          <div class="gyn-center" id="graph-year-label">2026年</div>
+          <button class="gyn-btn" id="gyn-next" onclick="chGraphYear(1)">次の年 <i class="ti ti-chevron-right"></i></button>
+        </div>
+
+        <!-- Bar chart card -->
+        <div class="card graph-bar-section" id="graph-bar-card">
+          <!-- Tooltip pill -->
+          <div class="graph-tooltip-pill" id="graph-tooltip" style="display:none">
+            <span class="gt-month" id="gt-month">8月</span>
+            <span class="gt-amount" id="gt-amount">¥70,526</span>
+          </div>
+          <!-- Canvas -->
+          <div class="bar-chart-wrap" id="bar-chart-wrap">
+            <canvas id="bar-chart"></canvas>
+          </div>
+          <!-- Average -->
+          <div class="graph-avg" id="graph-avg"></div>
+        </div>
+
+        <!-- Cumulative line chart -->
+        <div class="card" id="graph-line-card" style="display:none">
+          <div class="graph-section-label">累計 (Cumulative total)</div>
+          <div class="line-chart-wrap">
+            <canvas id="line-chart"></canvas>
           </div>
         </div>
       </div>
 
     </div>
   </div>
+
 
 
   <div class="bnav" style="grid-template-columns:repeat(7,1fr)">
