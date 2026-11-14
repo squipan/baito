@@ -53,18 +53,16 @@ function sMins(tin, tout) {
 function sPay(day, tin, tout) {
   if (!day || !tin || !tout) return 0;
   const we = day === '土' || day === '日';
-  const base = we ? 1270 : 1200;
+  const base = we ? 1370 : 1300;          // weekday ¥1300, weekend/holiday ¥1370 (+¥70)
   let i = tH(tin), o = tH(tout);
   if (o <= i) o += 24;
-  const pre = Math.max(0, Math.min(22, o) - i) * base;
-  const af = Math.max(0, o - Math.max(i, 22));
-  const f2 = Math.min(2, af) * base * 1.25;
-  const ov = Math.max(0, af - 2);
-  return Math.round(pre + f2 + Math.floor(ov) * (base * 1.25 + 150) + (ov % 1) * base * 1.25);
+  const pre = Math.max(0, Math.min(22, o) - i) * base;    // 05–22 hours × base
+  const af  = Math.max(0, o - Math.max(i, 22));           // 22–05 hours × base × 1.25
+  return Math.round(pre + af * base * 1.25);
 }
 function mEst(shifts) {
   const tot = shifts.filter(s => s.done).reduce((s, x) => s + sPay(x.day, x.tin, x.tout), 0);
-  return Math.round(tot - 200 - Math.round(tot * 0.0306));
+  return Math.round(tot - 300 - Math.round(tot * 0.0306));
 }
 function toast(msg) {
   const t = document.getElementById('toast');
@@ -495,7 +493,10 @@ function renderSalary() {
     }
     if (!yrSel.value) yrSel.value = curYr;
   }
-  const items = (gd('salary') || []).sort((a,b) => (b.year+b.month).localeCompare(a.year+a.month));
+  const items = (gd('salary') || []).sort((a, b) => {
+    if (b.year !== a.year) return parseInt(b.year) - parseInt(a.year);
+    return parseInt(b.month) - parseInt(a.month);  // parse "11月"→11 so order is correct
+  });
   const banner = document.getElementById('salary-year-banner');
   const el = document.getElementById('salary-list');
   const yr = new Date().getFullYear().toString();
