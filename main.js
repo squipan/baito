@@ -50,18 +50,29 @@ function sMins(tin, tout) {
   if (o <= i) o += 24;
   return Math.round((o - i) * 60);
 }
-function sPay(day, tin, tout) {
+function sPay(day, tin, tout, date) {
   if (!day || !tin || !tout) return 0;
   const we = day === '土' || day === '日';
-  const base = we ? 1370 : 1300;          // weekday ¥1300, weekend/holiday ¥1370 (+¥70)
   let i = tH(tin), o = tH(tout);
   if (o <= i) o += 24;
-  const pre = Math.max(0, Math.min(22, o) - i) * base;    // 05–22 hours × base
-  const af  = Math.max(0, o - Math.max(i, 22));           // 22–05 hours × base × 1.25
-  return Math.round(pre + af * base * 1.25);
+  // New rates from October 2026 onwards
+  if (date && date.slice(0, 7) >= '2026-10') {
+    const base = we ? 1370 : 1300;        // weekday ¥1300, weekend/holiday ¥1370 (+¥70)
+    const pre = Math.max(0, Math.min(22, o) - i) * base;
+    const af  = Math.max(0, o - Math.max(i, 22));
+    return Math.round(pre + af * base * 1.25);
+  } else {
+    // Old rates before October 2026
+    const base = we ? 1270 : 1200;
+    const pre = Math.max(0, Math.min(22, o) - i) * base;
+    const af  = Math.max(0, o - Math.max(i, 22));
+    const f2  = Math.min(2, af) * base * 1.25;
+    const ov  = Math.max(0, af - 2);
+    return Math.round(pre + f2 + Math.floor(ov) * (base * 1.25 + 150) + (ov % 1) * base * 1.25);
+  }
 }
 function mEst(shifts) {
-  const tot = shifts.filter(s => s.done).reduce((s, x) => s + sPay(x.day, x.tin, x.tout), 0);
+  const tot = shifts.filter(s => s.done).reduce((s, x) => s + sPay(x.day, x.tin, x.tout, x.date), 0);
   return Math.round(tot - 300 - Math.round(tot * 0.0306));
 }
 function toast(msg) {
@@ -165,7 +176,7 @@ function qlDate() {
 function qlCalc() {
   const day = document.getElementById('ql-day').value;
   const tin = document.getElementById('ql-in').value, tout = document.getElementById('ql-out').value;
-  const p = sPay(day, tin, tout), m = sMins(tin, tout);
+  const p = sPay(day, tin, tout, document.getElementById('ql-date').value), m = sMins(tin, tout);
   const box = document.getElementById('ql-prev');
   if (p && m) {
     document.getElementById('ql-pval').textContent = yen(p);
@@ -235,7 +246,7 @@ function renderMonths() {
   } else {
     let tMins = 0, tPay = 0;
     shifts.forEach(s => {
-      const pay = sPay(s.day, s.tin, s.tout);
+      const pay = sPay(s.day, s.tin, s.tout, s.date);
       const mins = sMins(s.tin, s.tout);
       if (s.done) { tMins += mins; tPay += pay; }
       const we = s.day === '土' || s.day === '日';
