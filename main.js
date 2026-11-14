@@ -1,7 +1,7 @@
 /* ── Service Worker ── */
 if ('serviceWorker' in navigator) {
   const swCode = `
-    const CACHE = 'income-v2';
+    const CACHE = 'income-v3';
     self.addEventListener('install', e => {
       e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])));
       self.skipWaiting();
