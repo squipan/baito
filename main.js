@@ -269,7 +269,10 @@ function delShift(id) {
 
 /* ── ENGLISH ── */
 function renderEnglish() {
-  const items = (gd('english') || []).sort((a,b) => (a.year+a.month).localeCompare(b.year+b.month));
+  const items = (gd('english') || []).sort((a, b) => {
+    if (a.year !== b.year) return parseInt(a.year) - parseInt(b.year);
+    return parseInt(a.month) - parseInt(b.month);
+  });
   const el = document.getElementById('english-list');
   const total = items.reduce((s, x) => s + (x.amount || 0), 0);
   if (!items.length) {
